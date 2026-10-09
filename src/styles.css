@@ -1,0 +1,199 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+/* Typefaces load from Google Fonts in __root.tsx: Bricolage Grotesque for
+   headlines (its width/optical axes carry the page's personality) and
+   Instrument Sans for running text. */
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow: var(--primary-glow);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-navy: var(--navy);
+  --color-light-blue: var(--light-blue);
+  --color-lichen: var(--light-blue);
+  --color-yellow: var(--yellow);
+  --color-yellow-foreground: var(--yellow-foreground);
+  --font-sans: "Instrument Sans", system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.75rem;
+  /* Climate Tech Startup Challenge palette (own concept until KISED supplies
+     a programme theme — swap these tokens and every page follows).
+     Spruce #0F2F2A ink · Canopy #1E6B4F primary · Lichen #D7EBD9 soft
+     surface · Mineral #F2F5F1 page · Solar amber #E9A82B, used sparingly.
+     Token names (navy / yellow / light-blue) are kept from the shared
+     codebase so components need no renaming. */
+  --background: #f2f5f1;
+  --foreground: #0f2f2a;
+  --card: #ffffff;
+  --card-foreground: #0f2f2a;
+  --popover: #ffffff;
+  --popover-foreground: #0f2f2a;
+  --primary: #1e6b4f;
+  --primary-foreground: #ffffff;
+  --primary-glow: #2f8f6a;
+  --navy: #0f2f2a;
+  --light-blue: #d7ebd9;
+  --yellow: #e9a82b;
+  --yellow-foreground: #0f2f2a;
+  --secondary: #e4efe5;
+  --secondary-foreground: #0f2f2a;
+  --muted: #e9efe9;
+  --muted-foreground: #4b5b57;
+  --accent: #d7ebd9;
+  --accent-foreground: #0f2f2a;
+  --destructive: #c2410c;
+  --destructive-foreground: #ffffff;
+  --border: #d5ded7;
+  --input: #c9d4cc;
+  --ring: #1e6b4f;
+
+  --gradient-hero: linear-gradient(180deg, #0f2f2a 0%, #123a33 100%);
+  --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%);
+  --gradient-wave: linear-gradient(180deg, transparent 0%, #e4efe5 100%);
+  --shadow-elegant: 0 18px 40px -24px rgb(15 47 42 / 0.45);
+  --shadow-card: 0 1px 0 rgb(15 47 42 / 0.06), 0 8px 24px -18px rgb(15 47 42 / 0.35);
+  --shadow-glow: 0 0 0 4px rgb(233 168 43 / 0.25);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  /* Samsung Internet / Chrome "dark theme for websites" repaints pages that
+     don't declare a scheme, which turned the CI blue black and the gold
+     brown on Tammy's phone. Declaring it on html AND body, plus an explicit
+     forced-colors opt-out, is what actually stops those engines. */
+  :root,
+  html,
+  body {
+    color-scheme: only light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root,
+    html,
+    body {
+      color-scheme: only light;
+    }
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@utility btn-hero {
+  /* Solar-amber CTA on the spruce hero */
+  background: var(--yellow);
+  color: var(--yellow-foreground);
+  box-shadow: 0 12px 30px -12px color-mix(in oklab, var(--yellow) 60%, transparent);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow), var(--shadow-elegant);
+  }
+}
+
+@utility btn-outline-hero {
+  background: transparent;
+  color: var(--primary-foreground);
+  border: 1.5px solid color-mix(in oklab, var(--primary-foreground) 60%, transparent);
+  transition: all 0.2s ease;
+  &:hover {
+    background: color-mix(in oklab, var(--primary-foreground) 15%, transparent);
+    border-color: var(--primary-foreground);
+  }
+}
+
+@utility card-startup {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-elegant);
+    border-color: color-mix(in oklab, var(--primary) 40%, transparent);
+  }
+}
+
+@utility bg-hero-gradient {
+  background: var(--gradient-hero);
+}
+
+@utility bg-wave-fade {
+  background: var(--gradient-wave);
+}
+
+
+/* Home hero. The headline uses Bricolage's narrow width so ten words stay
+   at display size; the ledger rows arrive once on load, each arrow drawing
+   from left to right — the page's only unprompted motion. */
+.hero-title {
+  font-variation-settings: "wdth" 88, "opsz" 96;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+.ledger-row {
+  animation: ledger-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0ms) both;
+}
+.ledger-row .ledger-arrow {
+  position: relative;
+  transform-origin: left center;
+  animation: ledger-draw 0.7s cubic-bezier(0.65, 0, 0.35, 1) calc(var(--d, 0ms) + 150ms) both;
+}
+.ledger-row .ledger-arrow::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: -3px;
+  border-left: 6px solid var(--yellow);
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+}
+.ledger-row a:hover .ledger-arrow { background: #fff; }
+@keyframes ledger-in {
+  from { opacity: 0; transform: translateY(6px); }
+}
+@keyframes ledger-draw {
+  from { transform: scaleX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ledger-row, .ledger-row .ledger-arrow { animation: none; }
+}
