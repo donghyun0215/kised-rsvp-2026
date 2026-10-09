@@ -16,7 +16,7 @@ import {
   getSlotInfo,
   isSlotOffered,
   ONE_ON_ONE_OPEN,
-  MEETUP_DATE, MEETUP_TIME, EVENT_NAME, MEETUP_VENUE, MEETUP_ADDRESS, MEETUP_MAP_URL } from "@/data/timeslots";
+  MEETUP_DATE, MEETUP_DAY_SHORT, MEETUP_TIME, EVENT_NAME, MEETUP_VENUE, MEETUP_MAP_URL } from "@/data/timeslots";
 import { supabase } from "@/lib/supabase-client";
 import {
   createRsvp,
@@ -381,12 +381,16 @@ function RsvpPage() {
       {/* HERO */}
       <section className="bg-hero-gradient text-primary-foreground">
         <div className="mx-auto max-w-5xl px-5 py-10 sm:px-6 sm:py-12">
-          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/70">
-            RSVP · {day === "5" ? `${MEETUP_DATE} · ${MEETUP_TIME}` : `${EVENT_DATE} · ${EVENT_TIME}`}
+          <div className="text-sm font-semibold text-primary-foreground/70">
+            {day === "5" ? "RSVP · 1:1 business meetings" : "RSVP · Demo Day"}
           </div>
-          <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
-            {day === "5" ? "Reserve Your 1:1 Meetings" : "Reserve Your Seat"}
+          <h1 className="mt-2 text-4xl font-bold leading-none sm:text-5xl">
+            <span className="sm:hidden">{day === "5" ? MEETUP_DAY_SHORT : EVENT_DAY_SHORT}</span>
+            <span className="hidden sm:inline">{day === "5" ? MEETUP_DATE : EVENT_DATE}</span>
           </h1>
+          <div className="mt-2 font-display text-2xl font-semibold text-yellow">
+            {day === "5" ? MEETUP_TIME : EVENT_TIME}
+          </div>
           <p className="mt-2 text-sm text-primary-foreground/85 sm:text-base">
             {day === "5" ? (
               <>
@@ -395,7 +399,7 @@ function RsvpPage() {
                     {MEETUP_VENUE}
                   </a>
                 ) : MEETUP_VENUE}{" "}
-                · {MEETUP_ADDRESS} · Private meetings with the startups of your choice
+                · Private meetings with the startups of your choice
               </>
             ) : (
               <>
@@ -539,7 +543,7 @@ function RsvpPage() {
               <h2 className="text-lg font-bold text-navy">{day === "5" ? "Pick Your Startups" : "Agenda"}</h2>
             </div>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              {day === "5" ? "One startup per round. Leave a round empty if you don't need it." : `${EVENT_DATE} · ${EVENT_VENUE}`}
+              {day === "5" ? "One startup per round. Leave a round empty if you don't need it. Greyed-out slots are already taken." : "Doors open 14:30. Stay for the networking dinner after the pitches."}
             </p>
 
             {day === "7" && (
@@ -583,11 +587,7 @@ function RsvpPage() {
             {/* 1:1 picker — appears when meetups checked and self-booking is open */}
             {ONE_ON_ONE_OPEN && attend.meetups && (
               <div className="mt-5 rounded-xl border border-primary/25 bg-primary/[0.03] p-4 sm:p-5">
-                <div className="text-sm font-bold text-navy">Pick your startups</div>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  One startup per round. Greyed-out slots are already taken.
-                  {loading && <LoadingNote text="Checking live availability…" className="ml-2 font-semibold text-primary" />}
-                </p>
+                {loading && <LoadingNote text="Checking live availability…" className="text-xs font-semibold text-primary" />}
                 {/* Phones: one card per startup, the rounds as full-width
                     buttons underneath — the table's round columns sat off-screen
                     at 360–390px with no hint that they scroll. */}

@@ -79,40 +79,13 @@ function CompanyOnePager() {
           <Link to="/" className="flex min-w-0 items-center">
             <Wordmark compact />
           </Link>
-          <nav className="flex shrink-0 items-center gap-1.5 sm:gap-3">
-            {onePager && (
-              <a
-                href={onePager}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full bg-secondary px-2.5 py-1.5 text-[11px] font-semibold text-secondary-foreground transition hover:bg-accent sm:px-4 sm:py-2 sm:text-sm"
-              >
-                ⬇ One-Pager
-              </a>
-            )}
-            {irDeck && (
-              <a
-                href={irDeck}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-secondary-foreground transition hover:bg-accent sm:block"
-              >
-                ⬇ IR Deck
-              </a>
-            )}
+          <nav className="flex shrink-0 items-center">
             <Link
               to="/"
               hash="startups"
-              className="hidden rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-secondary-foreground transition hover:bg-accent sm:block"
+              className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-navy transition hover:bg-muted sm:px-4 sm:py-2 sm:text-sm"
             >
-              All Startups
-            </Link>
-            <Link
-              to={meetTarget}
-              search={bookSearch}
-              className="rounded-full bg-primary px-2.5 py-1.5 text-[11px] font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 sm:px-4 sm:py-2 sm:text-sm"
-            >
-              {bookLabel}
+              All startups
             </Link>
           </nav>
         </div>

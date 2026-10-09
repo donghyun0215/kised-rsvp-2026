@@ -443,8 +443,8 @@ function LoungePage() {
               <div className="relative mx-auto flex max-w-6xl flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
                 <Wordmark light />
                 <div>
-                  <div className="text-sm font-bold text-white">2026 Climate Tech Startup Challenge</div>
-                  <div className="mt-1 text-xs text-white/70">Singapore Demo Day · Wed 28 Oct</div>
+                  <div className="text-sm font-bold text-white">Climate Tech IR / Demo Day</div>
+                  <div className="mt-1 text-xs text-white/70">Wed 28 Oct 2026 · Singapore</div>
                 </div>
                 <div>
                   <div className="text-sm font-bold text-white">Contact</div>

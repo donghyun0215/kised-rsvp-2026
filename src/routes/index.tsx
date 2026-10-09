@@ -21,8 +21,6 @@ import {
   MEETUP_TIME,
   MEETUP_VENUE,
   ONE_ON_ONE_OPEN,
-  PROGRAM,
-  TIMESLOTS,
 } from "@/data/timeslots";
 
 export const Route = createFileRoute("/")({
@@ -94,7 +92,6 @@ function Place({ venue, address, map }: { venue: string; address: string; map: s
 }
 
 function Landing() {
-  const demo = PROGRAM.filter((p) => p.id !== "meetups");
   return (
     <div className="min-h-screen">
       {/* HERO — the ledger */}
@@ -159,28 +156,24 @@ function Landing() {
         </div>
       </section>
 
-      {/* JOIN — two days, in order */}
+      {/* JOIN — two days. One big line per card says what matters (day + time);
+          everything else is small. Details repeat on the RSVP page. */}
       <section id="rsvp" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
         <h2 className="max-w-xl text-3xl font-bold text-navy md:text-4xl">Two days in Singapore</h2>
         <p className="mt-3 max-w-xl text-muted-foreground">
-          For investors, corporates and ecosystem partners. Register for either day or both; it takes a minute.
+          For investors, corporates and ecosystem partners. Register for either day or both.
         </p>
 
         <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2">
           <article className="flex flex-col bg-card p-6 sm:p-8">
-            <div className="flex items-baseline gap-4">
-              <span className="font-display text-6xl font-bold leading-none text-primary">28</span>
-              <span className="text-sm text-muted-foreground">{EVENT_DAY_SHORT} · {EVENT_TIME}</span>
-            </div>
-            <h3 className="mt-5 text-2xl font-bold text-navy">Demo Day</h3>
-            <dl className="mt-4 divide-y divide-border border-y border-border text-sm">
-              {demo.map((p) => (
-                <div key={p.id} className="flex gap-4 py-2.5">
-                  <dt className="w-28 shrink-0 font-semibold tabular-nums text-primary">{p.time}</dt>
-                  <dd className="text-navy">{p.title}</dd>
-                </div>
-              ))}
-            </dl>
+            <h3 className="text-xl font-semibold text-muted-foreground">Demo Day</h3>
+            <p className="mt-2 font-display text-[clamp(2rem,4.5vw,3rem)] font-bold leading-none tracking-tight text-navy">
+              {EVENT_DAY_SHORT}
+            </p>
+            <p className="mt-2 font-display text-2xl font-semibold text-primary">{EVENT_TIME}</p>
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
+              Ten startup pitches with an ecosystem talk and panel, then a networking dinner. Registration from 14:30.
+            </p>
             <div className="mt-4">
               <Place venue={EVENT_VENUE} address={EVENT_ADDRESS} map={EVENT_MAP_URL} />
             </div>
@@ -192,22 +185,14 @@ function Landing() {
           </article>
 
           <article className="flex flex-col bg-card p-6 sm:p-8">
-            <div className="flex items-baseline gap-4">
-              <span className="font-display text-6xl font-bold leading-none text-primary">29</span>
-              <span className="text-sm text-muted-foreground">{MEETUP_DAY_SHORT} · {MEETUP_TIME}</span>
-            </div>
-            <h3 className="mt-5 text-2xl font-bold text-navy">1:1 business meetings</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Private meetings with the startups of your choice, the morning after the pitches. Pick one startup per round.
+            <h3 className="text-xl font-semibold text-muted-foreground">1:1 business meetings</h3>
+            <p className="mt-2 font-display text-[clamp(2rem,4.5vw,3rem)] font-bold leading-none tracking-tight text-navy">
+              {MEETUP_DAY_SHORT}
             </p>
-            <dl className="mt-4 divide-y divide-border border-y border-border text-sm">
-              {TIMESLOTS.map((t) => (
-                <div key={t.id} className="flex gap-4 py-2.5">
-                  <dt className="w-28 shrink-0 font-semibold tabular-nums text-primary">{t.time}</dt>
-                  <dd className="text-navy">{t.label}</dd>
-                </div>
-              ))}
-            </dl>
+            <p className="mt-2 font-display text-2xl font-semibold text-primary">{MEETUP_TIME}</p>
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
+              Four 25-minute rounds with the startups you pick, the morning after the pitches.
+            </p>
             <div className="mt-4">
               <Place venue={MEETUP_VENUE} address={MEETUP_ADDRESS} map={MEETUP_MAP_URL} />
             </div>
@@ -229,10 +214,10 @@ function Landing() {
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
           <h2 className="text-3xl font-bold text-navy md:text-4xl">The startups</h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Each profile links to the company's one-pager. Contact details are on the one-pager; 1:1 meetings are booked here.
+            Open a profile for the full one-pager, or book a 1:1 straight away.
           </p>
 
-          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
             {companies.map((c) => (
               <article key={c.slug} className="card-startup group flex flex-col overflow-hidden rounded-xl">
                 <Link to="/companies/$slug" params={{ slug: c.slug }} className="block aspect-[3/2] overflow-hidden bg-muted">
@@ -243,12 +228,12 @@ function Landing() {
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                   />
                 </Link>
-                <div className="flex flex-1 flex-col gap-2 p-4">
+                <div className="flex flex-1 flex-col gap-2 p-3 sm:p-4">
                   <Link to="/companies/$slug" params={{ slug: c.slug }} className="flex h-8 items-center" title={c.name}>
-                    <img src={STARTUP_LOGOS[c.slug]} alt={c.name} className="max-h-8 max-w-[150px] object-contain object-left" />
+                    <img src={STARTUP_LOGOS[c.slug]} alt={c.name} className="max-h-7 max-w-[120px] object-contain object-left sm:max-h-8 sm:max-w-[150px]" />
                   </Link>
                   <div className="text-xs font-semibold text-primary">{c.sector}</div>
-                  <p className="line-clamp-3 text-[13px] leading-relaxed text-muted-foreground">{c.tagline}</p>
+                  <p className="line-clamp-3 text-xs leading-relaxed text-muted-foreground sm:text-[13px]">{c.tagline}</p>
                   <div className="mt-auto flex flex-col gap-2 pt-2">
                     <Link
                       to="/companies/$slug"
