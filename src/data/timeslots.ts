@@ -6,42 +6,49 @@ export interface Timeslot {
 
 // ── 2026 Climate Tech Startup Challenge · Singapore (KISED / 창업진흥원) ──
 // Everything event-specific lives in this file, so a confirmed venue or time
-// is a one-line change. Source: "Lodestart Internship" sheet, Schedule tab
-// (9 Oct): programme 26–30 Oct, Demo Day Wed 28 Oct 14:30–20:30, 1:1
-// meetings Thu 29 Oct (10:00 / 11:00, two per startup). Venues TBD.
-// Event name taken from the one-pager template footer ("2026 Climate Tech
-// Startup Challenge – Singapore"); confirm the official English name with
-// KISED before launch.
+// is a one-line change. Source: MYSC master sheet "창진원 2026년 기후테크
+// 스타트업 챌린지" (timetable 0921, To-Do, Temasek Shophouse form), read
+// 10 Oct. Programme 26–29 Oct; public days are the IR / Demo Day (28 Oct)
+// and the 1:1 business meetings (29 Oct).
 // Public site URL used in emails. ponytail: set once the Vercel project exists.
 export const SITE_URL = "https://kised-rsvp-2026.vercel.app";
+// Per the Temasek Shophouse application: hosted by MSS & KISED, operated by
+// MYSC, partners New Energy Nexus & LodestarT.
 export const HOST_NAME = "Korea Institute of Startup & Entrepreneurship Development (KISED)";
+export const CREDITS = "Hosted by the Ministry of SMEs and Startups (MSS) and KISED · Operated by MYSC · Partners: New Energy Nexus, LodestarT";
 
 export const EVENT_NAME = "2026 Climate Tech Startup Challenge Singapore";
 export const EVENT_NAME_SHORT = "Climate Tech Startup Challenge";
 export const EVENT_NAME_LINE1 = "2026 Climate Tech Startup Challenge";
-export const EVENT_NAME_LINE2 = "Singapore Demo Day";
+export const EVENT_NAME_LINE2 = "Climate Tech IR / Demo Day";
 
 export const EVENT_DATE = "Wednesday, 28 October 2026";
 export const EVENT_DAY_SHORT = "Wed 28 Oct";
-export const EVENT_TIME = "14:30 – 20:30";
-// Venue not confirmed yet: leave MAP_URL empty and the UI shows no map link.
-export const EVENT_VENUE = "Venue to be announced";
-export const EVENT_ADDRESS = "Singapore";
-export const EVENT_MAP_URL = "";
+export const EVENT_TIME = "14:30 – 20:00";
+// Temasek Shophouse is plan A (application filed via CIIP); plan B is The
+// Foundry / Marina One. Drop "(to be confirmed)" once approval lands.
+export const EVENT_VENUE = "Temasek Shophouse (to be confirmed)";
+export const EVENT_ADDRESS = "28 Orchard Road, Singapore 238832";
+export const EVENT_MAP_URL =
+  "https://www.google.com/maps/search/?api=1&query=Temasek+Shophouse+28+Orchard+Road+Singapore+238832";
 
 // Public 1:1 self-booking, same model as KIMST/CMK.
 export const ONE_ON_ONE_OPEN = true;
 
-// 1:1 rounds on Thu 29 Oct. IDs are stable references stored in bookings —
-// change labels/times freely, never the ids. Round length assumed 50 min
-// (sheet only gives start times 10:00 / 11:00) — confirm.
+// 1:1 meetings Thu 29 Oct 10:00–12:00, "about 30 min each, at least two per
+// startup" (timetable 0921). Four 25-min rounds with a 5-min changeover fit
+// that window. IDs are stable references stored in bookings — change
+// labels/times freely, never the ids.
 export const TIMESLOTS: Timeslot[] = [
-  { id: "slot1", label: "Round 1", time: "10:00 – 10:50" },
-  { id: "slot2", label: "Round 2", time: "11:00 – 11:50" },
+  { id: "slot1", label: "Round 1", time: "10:00 – 10:25" },
+  { id: "slot2", label: "Round 2", time: "10:30 – 10:55" },
+  { id: "slot3", label: "Round 3", time: "11:00 – 11:25" },
+  { id: "slot4", label: "Round 4", time: "11:30 – 11:55" },
 ];
-export const MEETUP_TIME = "10:00 – 11:50";
+export const MEETUP_TIME = "10:00 – 12:00";
 export const MEETUP_DATE = "Thursday, 29 October 2026";
 export const MEETUP_DAY_SHORT = "Thu 29 Oct";
+// Plan A is a NULDAM café buy-out (1:1s + one-pager display); not booked yet.
 export const MEETUP_VENUE = "Venue to be announced";
 export const MEETUP_ADDRESS = "Singapore";
 export const MEETUP_MAP_URL = "";
@@ -61,20 +68,19 @@ export interface ProgramBlock {
 }
 
 // NOTE: ids map to RSVP columns (attend_showcase / attend_lunch /
-// attend_meetups). "lunch" is the evening networking — legacy column name.
-// Pitch/networking split (17:30) follows the intern application form; TBC.
+// attend_meetups). "lunch" is the networking dinner — legacy column name.
 export const PROGRAM: ProgramBlock[] = [
   {
     id: "showcase",
-    title: "Startup Pitches",
-    time: "14:30 – 17:30",
-    description: "Ten Korean climate tech startups pitch to investors, corporates and agencies. Registration from 14:30.",
+    title: "Talks & IR pitching",
+    time: "15:00 – 18:30",
+    description: "Opening remarks, an ecosystem talk and panel, then ten startup pitches (5 min pitch, 5 min Q&A each). Registration from 14:30.",
   },
   {
     id: "lunch",
-    title: "Networking",
-    time: "17:30 – 20:30",
-    description: "Meet the founders and the investors, corporates and partners in the room.",
+    title: "Networking dinner",
+    time: "18:30 – 20:00",
+    description: "Catered dinner with the founders, investors, corporates and partners in the room.",
   },
   {
     id: "meetups",
@@ -82,6 +88,17 @@ export const PROGRAM: ProgramBlock[] = [
     time: `${MEETUP_DAY_SHORT} · ${MEETUP_TIME}`,
     description: "Private meetings with the startups of your choice, the morning after the Demo Day.",
   },
+];
+
+// Demo Day run of show (timetable 0921, TBC). Shown on the RSVP page.
+export const DEMO_AGENDA: [time: string, item: string][] = [
+  ["14:30 – 15:00", "Registration"],
+  ["15:00 – 15:25", "Opening and welcome remarks"],
+  ["15:25 – 16:05", "Talk and panel: climate tech in Singapore"],
+  ["16:15 – 17:10", "IR pitching, session 1 (5 startups)"],
+  ["17:20 – 18:10", "IR pitching, session 2 (5 startups)"],
+  ["18:10 – 18:30", "Judges' deliberation and group photo"],
+  ["18:30 – 20:00", "Networking dinner"],
 ];
 
 // ── Legacy side-track exports (no side track on this event) ─────────

@@ -6,6 +6,7 @@ import { companies, MEETUP_COMPANIES } from "@/data/companies";
 import {
   EVENT_DATE,
   EVENT_DAY_SHORT,
+  DEMO_AGENDA,
   EVENT_TIME,
   EVENT_VENUE,
   EVENT_ADDRESS,
@@ -508,7 +509,7 @@ function RsvpPage() {
           <div className="mb-8 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-900">
             <div className="font-semibold">Some 1:1 picks couldn't be booked — the rest of your RSVP is confirmed.</div>
             <ul className="mt-2 space-y-1 text-sm">
-              {(submitted.attend.showcase || submitted.attend.lunch) && <li>✓ Demo Day ({EVENT_DAY_SHORT} · {EVENT_TIME}: registration, pitches & networking)</li>}
+              {(submitted.attend.showcase || submitted.attend.lunch) && <li>✓ Demo Day ({EVENT_DAY_SHORT} · {EVENT_TIME}: registration, talks, pitches & networking dinner)</li>}
               {submitted.bookings.map((b) => {
                 const c = companies.find((x) => x.slug === b.companySlug);
                 const t = TIMESLOTS.find((x) => x.id === b.timeslotId);
@@ -543,7 +544,7 @@ function RsvpPage() {
 
             {day === "7" && (
               <div className="mt-5 divide-y divide-border rounded-xl border border-border bg-background">
-                {PROGRAM.filter((p) => p.id !== "meetups").map(({ time, title: label }) => (
+                {DEMO_AGENDA.map(([time, label]) => (
                   <div key={time} className="flex items-center gap-4 px-4 py-3.5">
                     <span className="w-28 shrink-0 text-sm font-bold text-primary">{time}</span>
                     <span className="text-sm font-semibold text-navy">{label}</span>

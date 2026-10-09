@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Wordmark } from "@/components/Wordmark";
 import { useEffect, useState } from "react";
 import { companies, MEETUP_COMPANIES } from "@/data/companies";
-import { EVENT_VENUE, MEETUP_DAY_SHORT, MEETUP_TIME, MEETUP_VENUE, PROGRAM, TIMESLOTS, isSlotOffered, EVENT_NAME } from "@/data/timeslots";
+import { CREDITS, DEMO_AGENDA, EVENT_VENUE, MEETUP_DAY_SHORT, MEETUP_TIME, MEETUP_VENUE, TIMESLOTS, isSlotOffered, EVENT_NAME } from "@/data/timeslots";
 import { fetchMeetingRoster, type RosterEntry } from "@/lib/booking.server";
 import { LoadingNote } from "@/components/Spinner";
 import { absUrl } from "@/lib/url";
@@ -42,18 +42,51 @@ interface ScheduleDay {
   joint?: boolean; // joint day
 }
 
-// Source: "Lodestart Internship" sheet, Schedule tab (9 Oct). Programme runs
-// 26–30 Oct; only the two public days are confirmed so far. Add the other
-// days here once the itinerary is final.
+// Source: MYSC master sheet, timetable 0921 + To-Do (read 10 Oct). Items
+// marked TBC there are still TBC here; update as bookings land.
 const DAYS: ScheduleDay[] = [
   {
-    date: "10/28", dow: "Wed", theme: "Demo Day",
-    joint: true,
-    items: PROGRAM.filter((p) => p.id !== "meetups").map((p) => ({ time: p.time, title: p.title, venue: EVENT_VENUE, highlight: true })),
+    date: "10/26", dow: "Mon", theme: "Arrival",
+    transport: "Airport → hotel by chartered bus",
+    items: [
+      { time: "20:25", title: "KE flight lands · YULMIX, Apexion, Solarlease, GIGAette" },
+      { time: "21:55", title: "OZ flight lands · The Origin, REBLOCK, greenMRV, ReFeed, YULMIX" },
+      { time: "22:30", title: "Terracle lands" },
+      { title: "Arriving separately · MCE (from 15 Oct / via Taipei), ReFeed (24 & 27 Oct)" },
+      { title: "Transfer to hotel and check-in", venue: "Wyndham Singapore Hotel" },
+    ],
   },
   {
-    date: "10/29", dow: "Thu", theme: "1:1 Business Meetings",
-    items: TIMESLOTS.map((t) => ({ time: t.time, title: `1:1 meetings · ${t.label}`, venue: MEETUP_VENUE, highlight: true })),
+    date: "10/27", dow: "Tue", theme: "Orientation & SWITCH",
+    transport: "45-seat bus all day",
+    items: [
+      { time: "10:00 – 12:00", title: "Orientation · Singapore market entry & incorporation", note: "Tammy Ahn (LodestarT) · Hogyun Min (AKIGPT): Singapore climate tech & Green Plan 2030", highlight: true },
+      { time: "12:30 – 14:00", title: "Lunch & cohort networking" },
+      { time: "15:00 – 18:00", title: "SWITCH 2026", venue: "Sands Expo & Convention Centre, Hall A–C", note: "Individual pre-registration required", highlight: true },
+      { time: "18:30", title: "Welcome dinner (TBC)" },
+    ],
+  },
+  {
+    date: "10/28", dow: "Wed", theme: "Climate Tech IR / Demo Day",
+    joint: true,
+    transport: "45-seat bus all day",
+    items: [
+      { time: "10:00 – 12:00", title: "On-site briefing & pitch rehearsal", venue: EVENT_VENUE },
+      { time: "12:00 – 13:30", title: "Lunch" },
+      ...DEMO_AGENDA.map(([time, title]) => ({ time, title, highlight: /pitching|Registration/.test(title) })),
+    ],
+  },
+  {
+    date: "10/29", dow: "Thu", theme: "1:1 Meetings & Wrap-up",
+    transport: "45-seat bus · airport by 20:00",
+    items: [
+      ...TIMESLOTS.map((t) => ({ time: t.time, title: `1:1 meetings · ${t.label}`, venue: MEETUP_VENUE, highlight: true })),
+      { time: "12:00 – 14:00", title: "Lunch & programme wrap-up", venue: "Tanglin Club, Boardroom" },
+      { time: "14:00 – 17:00", title: "Free time: own meetings, SWITCH or JTC Community Day" },
+      { time: "15:00 – 16:00", title: "Visit · Vidacity", venue: "LaunchPad @ one-north" },
+      { time: "17:30 – 19:00", title: "Farewell dinner" },
+      { title: "Depart Changi (KE 22:30 / OZ 23:10)" },
+    ],
   },
 ];
 
@@ -63,9 +96,9 @@ const TRACK_META = [
     label: "Cohort",
     title: EVENT_NAME,
     companies: companies.map((c) => c.name).join(" · "),
-    period: "Mon 26 Oct – Fri 30 Oct",
+    period: "Mon 26 Oct – Thu 29 Oct",
     days: DAYS,
-    note: "Only the public days are shown. Venues and the full itinerary are still to be confirmed." as string | null,
+    note: "Provisional (TBC) per the MYSC master timetable; venues and times may still change." as string | null,
   },
 ];
 
@@ -153,7 +186,7 @@ function SchedulePage() {
         </div>
 
         {/* Desktop: at-a-glance grid (whole track on one screen) */}
-        <div className="mt-6 hidden gap-3 lg:grid lg:grid-cols-2">
+        <div className="mt-6 hidden gap-3 lg:grid lg:grid-cols-4">
           {track.days.map((d) => (
             <button
               type="button"
@@ -276,7 +309,7 @@ function SchedulePage() {
         </div>
 
         <footer className="mt-10 text-center text-xs text-muted-foreground">
-          Hosted by the Korea Institute of Startup &amp; Entrepreneurship Development (KISED) · Organized by LodestarT
+          {CREDITS}
         </footer>
 
           </>

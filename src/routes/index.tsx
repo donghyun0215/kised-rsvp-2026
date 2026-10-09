@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type CSSProperties } from "react";
 import lodestartLogo from "@/assets/logos/lodestart.png";
+import myscLogo from "@/assets/logos/mysc.png";
 import { Wordmark } from "@/components/Wordmark";
 import { JUDGES } from "@/data/speakers";
 import { companies } from "@/data/companies";
@@ -12,6 +13,7 @@ import {
   EVENT_NAME,
   EVENT_TIME,
   EVENT_VENUE,
+  CREDITS,
   HOST_NAME,
   MEETUP_ADDRESS,
   MEETUP_DAY_SHORT,
@@ -110,13 +112,13 @@ function Landing() {
 
         <div className="mx-auto grid max-w-7xl gap-12 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:pb-24 lg:pt-14">
           <div className="lg:pt-4">
-            <p className="text-sm font-medium text-lichen">Singapore Demo Day · {EVENT_DAY_SHORT} 2026</p>
+            <p className="text-sm font-medium text-lichen">Climate Tech IR / Demo Day · {EVENT_DAY_SHORT} 2026</p>
             <h1 className="hero-title mt-4 text-[clamp(2.6rem,9vw,5.2rem)] font-bold leading-[0.92] text-white">
               Ten Korean startups turning waste into markets
             </h1>
             <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/80">
-              Selected by KISED for the 2026 Climate Tech Startup Challenge, they come to Singapore to meet investors,
-              corporates and partners. Watch them pitch, then sit down with the ones that fit.
+              Selected through the 2026 Climate Tech Startup Challenge, Korea's government-backed programme, they come to
+              Singapore to meet investors, corporates and partners. Watch them pitch, then sit down with the ones that fit.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/book" search={{ day: "7" }} className="btn-hero rounded-full px-6 py-3.5 text-sm font-semibold">
@@ -288,30 +290,52 @@ function Landing() {
         </section>
       )}
 
-      {/* HOST & ORGANIZER */}
+      {/* HOSTS, OPERATOR, PARTNERS — credits as filed in the venue application */}
       <section id="about" className="bg-navy text-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 md:py-20">
-          <div>
-            <p className="text-sm font-medium text-lichen">Host</p>
-            <h2 className="mt-2 text-2xl font-bold md:text-3xl">{HOST_NAME}</h2>
-            <p className="mt-4 max-w-lg leading-relaxed text-white/80">
-              KISED is Korea's public agency for startups under the Ministry of SMEs and Startups. It runs the national
-              programmes that take founders from first idea to global expansion, and selected this cohort for the 2026
-              Climate Tech Startup Challenge.
-            </p>
-            <a href={KISED_SITE} target="_blank" rel="noopener noreferrer" className="mt-5 inline-block text-sm font-semibold text-yellow underline-offset-4 hover:underline">
-              kised.or.kr
-            </a>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-lichen">Organizer</p>
-            <div className="mt-3 inline-flex rounded-lg bg-white px-4 py-3">
-              <img src={lodestartLogo} alt="LodestarT" className="h-8 w-auto object-contain" />
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20">
+          <h2 className="max-w-2xl text-2xl font-bold md:text-3xl">About the 2026 Climate Tech Startup Challenge</h2>
+          <p className="mt-4 max-w-2xl leading-relaxed text-white/80">
+            A government-backed Korean programme that helps early-stage climate tech startups enter global markets, get
+            investment-ready and build international partnerships. The ten startups selected in Korea spend 26–29 October in
+            Singapore for ecosystem sessions, SWITCH, the IR / Demo Day and 1:1 business meetings.
+          </p>
+
+          <div className="mt-12 grid gap-10 border-t border-white/15 pt-10 md:grid-cols-3">
+            <div>
+              <p className="text-sm font-medium text-lichen">Hosted by</p>
+              <p className="mt-3 font-display text-lg font-semibold leading-snug">Ministry of SMEs and Startups (MSS)</p>
+              <p className="mt-1 font-display text-lg font-semibold leading-snug">{HOST_NAME}</p>
+              <p className="mt-3 text-sm leading-relaxed text-white/75">
+                KISED is Korea's public agency for startups under MSS, running the national programmes that take founders
+                from first idea to global expansion.
+              </p>
+              <a href={KISED_SITE} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-sm font-semibold text-yellow underline-offset-4 hover:underline">
+                kised.or.kr
+              </a>
             </div>
-            <p className="mt-4 max-w-lg leading-relaxed text-white/80">
-              LodestarT is an ecosystem builder bridging South Korea and Singapore, connecting Korean startups with
-              Singaporean investors and strategic partners for cross-border growth.
-            </p>
+            <div>
+              <p className="text-sm font-medium text-lichen">Operated by</p>
+              <div className="mt-3 inline-flex rounded-lg bg-white px-4 py-3">
+                <img src={myscLogo} alt="MYSC" className="h-7 w-auto object-contain" />
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-white/75">
+                MYSC is a Korean impact accelerator and investor that has found, grown and invested in climate, energy and
+                impact startups for 15 years.
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-lichen">Partners</p>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <span className="inline-flex rounded-lg bg-white px-4 py-3">
+                  <img src={lodestartLogo} alt="LodestarT" className="h-7 w-auto object-contain" />
+                </span>
+                <span className="font-display text-lg font-semibold">New Energy Nexus</span>
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-white/75">
+                LodestarT bridges South Korea and Singapore, connecting Korean startups with Singaporean investors and
+                strategic partners. New Energy Nexus supports clean-energy entrepreneurs worldwide.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -323,7 +347,7 @@ function Landing() {
             <a href={`mailto:${ORGANIZER_EMAIL}`} className="font-semibold text-primary hover:underline">{ORGANIZER_EMAIL}</a>
           </div>
           <div className="w-full border-t border-border pt-6 text-xs">
-            © {EVENT_NAME}. Hosted by KISED, organized by LodestarT.
+            © {EVENT_NAME}. {CREDITS}.
           </div>
         </div>
       </footer>

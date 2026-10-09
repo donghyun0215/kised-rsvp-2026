@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Wordmark } from "@/components/Wordmark";
 import { useMemo, useState } from "react";
-import { EVENT_NAME } from "@/data/timeslots";
+import { CREDITS, EVENT_NAME } from "@/data/timeslots";
 import { companies } from "@/data/companies";
 import { STARTUP_LOGOS } from "@/data/companyImages";
 import {
@@ -895,7 +895,7 @@ function LoungePage() {
 
         {profiles && (
           <footer className="mt-10 text-center text-xs text-muted-foreground">
-            Hosted by the Korea Institute of Startup &amp; Entrepreneurship Development (KISED) · Organized by LodestarT
+            {CREDITS}
           </footer>
         )}
       </main>

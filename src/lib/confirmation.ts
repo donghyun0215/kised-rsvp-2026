@@ -107,17 +107,17 @@ export function buildConfirmation(input: ConfirmationInput): ConfirmationEmail {
     });
   const demoDay: string[] = [];
   if (input.attendShowcase) demoDay.push(`Registration from 14:30 · Startup Pitches ${programTime("showcase")}`);
-  if (input.attendLunch) demoDay.push(`Networking ${programTime("lunch")}`);
+  if (input.attendLunch) demoDay.push(`Networking dinner ${programTime("lunch")}`);
 
   const meetupsCal = gcal(
     "Climate Tech Startup Challenge · 1:1 Business Meetings",
-    "20261029T100000/20261029T115000",
+    "20261029T100000/20261029T120000",
     `${MEETUP_VENUE}, ${MEETUP_ADDRESS}`,
     ["Your 1:1 meetings:", ...meetings.map((m) => `• ${m.round} ${m.time} — ${m.company}`), "", `Manage: ${SITE}/book#manage`].join("\n"),
   );
   const demoCal = gcal(
     "Climate Tech Startup Challenge · Singapore Demo Day",
-    "20261028T143000/20261028T203000",
+    "20261028T143000/20261028T200000",
     `${EVENT_VENUE}, ${EVENT_ADDRESS}`,
     [...demoDay.map((d) => `• ${d}`), "", SITE].join("\n"),
   );
@@ -149,7 +149,7 @@ export function buildConfirmation(input: ConfirmationInput): ConfirmationEmail {
   t.push(`View or cancel your 1:1 meetings: ${SITE}/book#manage`);
   t.push(`Startup one-pagers: ${SITE}/#startups`, "");
   t.push("Need to change something? Re-submit the RSVP form with the same email, or simply reply to this email.", "");
-  if (!personal) t.push("Warm regards,", "LodestarT team, on behalf of KISED");
+  if (!personal) t.push("Warm regards,", "LodestarT team, for the 2026 Climate Tech Startup Challenge");
 
   // ── HTML
   const F = "font-family:Arial,Helvetica,sans-serif;";
@@ -182,9 +182,9 @@ ${personal.map((l) => `<p style="${P}">${esc(l)}</p>`).join("\n")}
 ${personalHtml}
 <table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;${personal ? "border:1px solid #d5ded7;" : ""}">
   <tr><td style="background:#1e6b4f;padding:22px 32px;">
-    <div style="${F}font-size:10px;letter-spacing:1px;font-weight:bold;color:#ffffff;text-transform:uppercase;">KISED | Climate Tech Startup Challenge</div>
+    <div style="${F}font-size:10px;letter-spacing:1px;font-weight:bold;color:#ffffff;text-transform:uppercase;">MSS · KISED | Climate Tech Startup Challenge</div>
     <div style="${F}padding-top:8px;font-size:24px;line-height:28px;font-weight:800;color:#ffffff;">${esc(copy.headline)}</div>
-    <div style="${F}padding-top:4px;font-size:13px;font-weight:bold;color:#e9a82b;">Singapore Demo Day · 28–29 October 2026</div>
+    <div style="${F}padding-top:4px;font-size:13px;font-weight:bold;color:#e9a82b;">Climate Tech IR / Demo Day · 28–29 October 2026</div>
   </td></tr>
   ${personal ? `<tr><td style="padding:20px 32px 0;"></td></tr>` : `<tr><td style="padding:24px 32px 16px;${F}font-size:15px;line-height:22px;color:#0f2f2a;">
     Dear <strong>${esc(input.fullName)}</strong>,<br><br>
@@ -206,7 +206,7 @@ ${personalHtml}
     Need to change something? Re-submit the RSVP form with the same email, or simply reply to this email.
   </td></tr>
   ${personal ? "" : `<tr><td style="background:#f2f5f1;border-top:1px solid #d5ded7;padding:18px 32px;${F}font-size:14px;line-height:20px;color:#0f2f2a;">
-    Warm regards,<br><strong style="color:#1e6b4f;">LodestarT team</strong><br><span style="font-size:12px;color:#4b5b57;">on behalf of KISED</span>
+    Warm regards,<br><strong style="color:#1e6b4f;">LodestarT team</strong><br><span style="font-size:12px;color:#4b5b57;">for the 2026 Climate Tech Startup Challenge</span>
   </td></tr>`}
 </table></td></tr></table></body></html>`;
 

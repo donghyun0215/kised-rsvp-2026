@@ -315,7 +315,7 @@ function CompanyOnePager() {
       <footer className="border-t border-border bg-background">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-5">
           <Wordmark />
-          <div className="text-xs text-muted-foreground">© 2026 KISED · {EVENT_NAME}</div>
+          <div className="text-xs text-muted-foreground">© {EVENT_NAME} · Hosted by MSS &amp; KISED · Operated by MYSC</div>
         </div>
       </footer>
     </div>
