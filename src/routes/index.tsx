@@ -96,14 +96,17 @@ function Landing() {
     <div className="min-h-screen">
       {/* HERO — the ledger */}
       <section id="top" className="bg-hero-gradient text-white">
-        <header className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
+        {/* Phones: wordmark row, then the menu row (four items never fit
+            beside the wordmark at 390px); from md they share one line. */}
+        <header className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between">
           <a href="#top" className="min-w-0">
             <Wordmark light />
           </a>
-          <nav className="flex shrink-0 items-center gap-1 text-xs font-semibold sm:gap-2 sm:text-sm">
-            <a href="#startups" className="hidden rounded-full px-3 py-2 text-white/85 hover:text-white sm:inline">Startups</a>
-            <a href="/lounge" className="rounded-full px-2 py-2 text-white/85 hover:text-white sm:px-3">Lounge</a>
-            <ContactOrganizer />
+          <nav className="-mx-2 flex items-center gap-1 text-sm font-semibold md:mx-0 md:gap-2">
+            <a href="#startups" className="rounded-full px-2 py-1.5 text-white/85 hover:text-white md:px-3 md:py-2">Startups</a>
+            <a href="#about" className="rounded-full px-2 py-1.5 text-white/85 hover:text-white md:px-3 md:py-2">About</a>
+            <a href="/lounge" className="rounded-full px-2 py-1.5 text-white/85 hover:text-white md:px-3 md:py-2">Lounge</a>
+            <span className="ml-auto md:ml-1"><ContactOrganizer /></span>
           </nav>
         </header>
 
