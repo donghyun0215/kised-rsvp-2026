@@ -1,7 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type CSSProperties } from "react";
-import lodestartLogo from "@/assets/logos/lodestart.png";
-import myscLogo from "@/assets/logos/mysc.png";
 import mssLogo from "@/assets/logos/mss.png";
 import kisedLogo from "@/assets/logos/kised.png";
 import { Wordmark } from "@/components/Wordmark";
@@ -277,7 +275,7 @@ function Landing() {
         </section>
       )}
 
-      {/* HOSTS & ORGANIZERS — the four logos only (client request, 10 Oct) */}
+      {/* HOSTS — MSS and KISED only for now (client request, 10 Oct) */}
       <section id="about" className="bg-navy text-white">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20">
           <h2 className="max-w-2xl text-2xl font-bold md:text-3xl">About the 2026 Climate Tech Startup Challenge</h2>
@@ -287,27 +285,28 @@ function Landing() {
             Singapore for ecosystem sessions, SWITCH, the IR / Demo Day and 1:1 business meetings.
           </p>
 
-          <div className="mt-12 grid gap-8 border-t border-white/15 pt-10 md:grid-cols-2">
-            <div>
-              <p className="text-sm font-medium text-lichen">Hosted by</p>
-              <div className="mt-3 grid grid-cols-2 gap-3">
+          <div className="mt-12 border-t border-white/15 pt-10">
+            <p className="text-sm font-medium text-lichen">Hosted by</p>
+            <div className="mt-4 grid gap-8 md:grid-cols-2">
+              <div>
                 <a href={MSS_SITE} target="_blank" rel="noopener noreferrer" className="flex h-20 items-center justify-center rounded-xl bg-white p-3">
                   <img src={mssLogo} alt="Ministry of SMEs and Startups" className="max-h-full max-w-full object-contain" />
                 </a>
+                <p className="mt-4 font-display text-lg font-semibold leading-snug">Ministry of SMEs and Startups (MSS)</p>
+                <p className="mt-2 text-sm leading-relaxed text-white/75">
+                  The Korean government ministry for small and medium-sized enterprises, startups and venture companies,
+                  and the policy home of the national startup programmes.
+                </p>
+              </div>
+              <div>
                 <a href={KISED_SITE} target="_blank" rel="noopener noreferrer" className="flex h-20 items-center justify-center rounded-xl bg-white p-3">
                   <img src={kisedLogo} alt="Korea Institute of Startup & Entrepreneurship Development (KISED)" className="max-h-full max-w-full object-contain" />
                 </a>
-              </div>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-lichen">Organized by</p>
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <div className="flex h-20 items-center justify-center rounded-xl bg-white p-4">
-                  <img src={myscLogo} alt="MYSC" className="max-h-full max-w-full object-contain" />
-                </div>
-                <div className="flex h-20 items-center justify-center rounded-xl bg-white p-4">
-                  <img src={lodestartLogo} alt="LodestarT" className="max-h-full max-w-full object-contain" />
-                </div>
+                <p className="mt-4 font-display text-lg font-semibold leading-snug">Korea Institute of Startup &amp; Entrepreneurship Development (KISED)</p>
+                <p className="mt-2 text-sm leading-relaxed text-white/75">
+                  KISED is Korea's public agency for startups under MSS. It runs the national programmes that take founders
+                  from first idea to global expansion, and selected this cohort for the 2026 Climate Tech Startup Challenge.
+                </p>
               </div>
             </div>
           </div>

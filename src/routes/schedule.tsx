@@ -98,7 +98,7 @@ const TRACK_META = [
     companies: companies.map((c) => c.name).join(" · "),
     period: "Mon 26 Oct – Thu 29 Oct",
     days: DAYS,
-    note: "Provisional (TBC) per the MYSC master timetable; venues and times may still change." as string | null,
+    note: "Provisional (TBC); venues and times may still change." as string | null,
   },
 ];
 
