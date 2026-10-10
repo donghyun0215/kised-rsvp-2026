@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type CSSProperties } from "react";
 import lodestartLogo from "@/assets/logos/lodestart.png";
 import myscLogo from "@/assets/logos/mysc.png";
+import mssLogo from "@/assets/logos/mss.png";
+import kisedLogo from "@/assets/logos/kised.png";
 import { Wordmark } from "@/components/Wordmark";
 import { JUDGES } from "@/data/speakers";
 import { companies } from "@/data/companies";
@@ -14,7 +16,6 @@ import {
   EVENT_TIME,
   EVENT_VENUE,
   CREDITS,
-  HOST_NAME,
   MEETUP_ADDRESS,
   MEETUP_DAY_SHORT,
   MEETUP_MAP_URL,
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/")({
 
 const ORGANIZER_EMAIL = "support@lodestart.ai";
 const KISED_SITE = "https://www.kised.or.kr";
+const MSS_SITE = "https://www.mss.go.kr";
 
 // The page's one idea: every startup in the cohort turns something the
 // economy throws away (waste, heat, CO₂, idle roofs) into something it buys.
@@ -275,7 +277,7 @@ function Landing() {
         </section>
       )}
 
-      {/* HOSTS, OPERATOR, PARTNERS — credits as filed in the venue application */}
+      {/* HOSTS & ORGANIZERS — the four logos only (client request, 10 Oct) */}
       <section id="about" className="bg-navy text-white">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20">
           <h2 className="max-w-2xl text-2xl font-bold md:text-3xl">About the 2026 Climate Tech Startup Challenge</h2>
@@ -285,41 +287,28 @@ function Landing() {
             Singapore for ecosystem sessions, SWITCH, the IR / Demo Day and 1:1 business meetings.
           </p>
 
-          <div className="mt-12 grid gap-10 border-t border-white/15 pt-10 md:grid-cols-3">
+          <div className="mt-12 grid gap-8 border-t border-white/15 pt-10 md:grid-cols-2">
             <div>
               <p className="text-sm font-medium text-lichen">Hosted by</p>
-              <p className="mt-3 font-display text-lg font-semibold leading-snug">Ministry of SMEs and Startups (MSS)</p>
-              <p className="mt-1 font-display text-lg font-semibold leading-snug">{HOST_NAME}</p>
-              <p className="mt-3 text-sm leading-relaxed text-white/75">
-                KISED is Korea's public agency for startups under MSS, running the national programmes that take founders
-                from first idea to global expansion.
-              </p>
-              <a href={KISED_SITE} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-sm font-semibold text-yellow underline-offset-4 hover:underline">
-                kised.or.kr
-              </a>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <a href={MSS_SITE} target="_blank" rel="noopener noreferrer" className="flex h-20 items-center justify-center rounded-xl bg-white p-3">
+                  <img src={mssLogo} alt="Ministry of SMEs and Startups" className="max-h-full max-w-full object-contain" />
+                </a>
+                <a href={KISED_SITE} target="_blank" rel="noopener noreferrer" className="flex h-20 items-center justify-center rounded-xl bg-white p-3">
+                  <img src={kisedLogo} alt="Korea Institute of Startup & Entrepreneurship Development (KISED)" className="max-h-full max-w-full object-contain" />
+                </a>
+              </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-lichen">Operated by</p>
-              <div className="mt-3 inline-flex rounded-lg bg-white px-4 py-3">
-                <img src={myscLogo} alt="MYSC" className="h-7 w-auto object-contain" />
+              <p className="text-sm font-medium text-lichen">Organized by</p>
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="flex h-20 items-center justify-center rounded-xl bg-white p-4">
+                  <img src={myscLogo} alt="MYSC" className="max-h-full max-w-full object-contain" />
+                </div>
+                <div className="flex h-20 items-center justify-center rounded-xl bg-white p-4">
+                  <img src={lodestartLogo} alt="LodestarT" className="max-h-full max-w-full object-contain" />
+                </div>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-white/75">
-                MYSC is a Korean impact accelerator and investor that has found, grown and invested in climate, energy and
-                impact startups for 15 years.
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-lichen">Partners</p>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <span className="inline-flex rounded-lg bg-white px-4 py-3">
-                  <img src={lodestartLogo} alt="LodestarT" className="h-7 w-auto object-contain" />
-                </span>
-                <span className="font-display text-lg font-semibold">New Energy Nexus</span>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-white/75">
-                LodestarT bridges South Korea and Singapore, connecting Korean startups with Singaporean investors and
-                strategic partners. New Energy Nexus supports clean-energy entrepreneurs worldwide.
-              </p>
             </div>
           </div>
         </div>

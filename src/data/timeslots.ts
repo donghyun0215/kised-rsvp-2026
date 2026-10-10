@@ -12,10 +12,8 @@ export interface Timeslot {
 // and the 1:1 business meetings (29 Oct).
 // Public site URL used in emails. ponytail: set once the Vercel project exists.
 export const SITE_URL = "https://kised-rsvp-2026.vercel.app";
-// Per the Temasek Shophouse application: hosted by MSS & KISED, operated by
-// MYSC, partners New Energy Nexus & LodestarT.
-export const HOST_NAME = "Korea Institute of Startup & Entrepreneurship Development (KISED)";
-export const CREDITS = "Hosted by the Ministry of SMEs and Startups (MSS) and KISED · Operated by MYSC · Partners: New Energy Nexus, LodestarT";
+// Credits shown on the site: these four names only (client request, 10 Oct).
+export const CREDITS = "Hosted by the Ministry of SMEs and Startups (MSS) and KISED · Organized by MYSC and LodestarT";
 
 export const EVENT_NAME = "2026 Climate Tech Startup Challenge Singapore";
 export const EVENT_NAME_SHORT = "Climate Tech Startup Challenge";
