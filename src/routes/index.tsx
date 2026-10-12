@@ -190,6 +190,7 @@ function Landing() {
           </a>
           <nav className="-mx-2 flex items-center gap-1 text-sm font-semibold md:mx-0 md:gap-2">
             <a href="#startups" className="rounded-full px-2 py-1.5 text-white/85 hover:text-white md:px-3 md:py-2">Startups</a>
+            <a href="#judges" className="rounded-full px-2 py-1.5 text-white/85 hover:text-white md:px-3 md:py-2">Judges</a>
             <a href="#about" className="rounded-full px-2 py-1.5 text-white/85 hover:text-white md:px-3 md:py-2">About</a>
             <a href="/lounge" className="rounded-full px-2 py-1.5 text-white/85 hover:text-white md:px-3 md:py-2">Lounge</a>
             <span className="ml-auto md:ml-1"><ContactOrganizer /></span>
@@ -365,16 +366,23 @@ function Landing() {
         </div>
       </section>
 
-      {/* JUDGES — shown once confirmed in src/data/speakers.ts */}
+      {/* JUDGES — hidden while the list in src/data/speakers.ts is empty */}
       {JUDGES.length > 0 && (
         <section id="judges" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
-          <h2 className="text-3xl font-bold text-navy md:text-4xl">Judges</h2>
-          <div className="mt-10 grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5">
-            {JUDGES.map((j) => (
-              <div key={j.name}>
-                <img src={j.photo} alt={j.name} loading="lazy" className="aspect-square w-full rounded-xl object-cover" />
-                <div className="mt-3 font-display text-lg font-bold text-navy">{j.name}</div>
-                <div className="text-sm text-muted-foreground">{j.title}, {j.org}</div>
+          <h2 data-reveal className="text-3xl font-bold text-navy md:text-4xl">Demo Day judges</h2>
+          <p data-reveal className="mt-3 max-w-xl text-muted-foreground">
+            Investors and ecosystem leaders from Singapore and Korea score the ten pitches on {EVENT_DAY_SHORT}.
+          </p>
+          <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
+            {JUDGES.map((j, i) => (
+              <div key={j.name} data-reveal style={{ "--rd": `${i * 90}ms` } as CSSProperties} className="group text-center">
+                <div className="relative mx-auto h-36 w-36 md:h-44 md:w-44">
+                  <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgb(127_211_242/0.45),transparent_70%)] opacity-0 blur-md transition duration-500 group-hover:opacity-100" aria-hidden />
+                  <img src={j.photo} alt={j.name} loading="lazy" className="relative h-full w-full rounded-full object-cover ring-4 ring-white shadow-[var(--shadow-card)] transition duration-500 group-hover:scale-[1.04] group-hover:ring-yellow" />
+                </div>
+                <div className="mt-4 font-display text-lg font-bold text-navy">{j.name}</div>
+                {j.title && <div className="text-sm text-muted-foreground">{j.title}</div>}
+                <div className="text-sm font-semibold text-primary">{j.org}</div>
               </div>
             ))}
           </div>
