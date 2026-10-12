@@ -366,25 +366,29 @@ function Landing() {
         </div>
       </section>
 
-      {/* JUDGES — hidden while the list in src/data/speakers.ts is empty */}
+      {/* JUDGES — hidden while the list in src/data/speakers.ts is empty.
+          Same shape as the CMK site: centred, greyscale portraits. */}
       {JUDGES.length > 0 && (
-        <section id="judges" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
-          <h2 data-reveal className="text-3xl font-bold text-navy md:text-4xl">Demo Day judges</h2>
-          <p data-reveal className="mt-3 max-w-xl text-muted-foreground">
-            Investors and ecosystem leaders from Singapore and Korea score the ten pitches on {EVENT_DAY_SHORT}.
-          </p>
-          <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
-            {JUDGES.map((j, i) => (
-              <div key={j.name} data-reveal style={{ "--rd": `${i * 90}ms` } as CSSProperties} className="group text-center">
-                <div className="relative mx-auto h-36 w-36 md:h-44 md:w-44">
-                  <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgb(127_211_242/0.45),transparent_70%)] opacity-0 blur-md transition duration-500 group-hover:opacity-100" aria-hidden />
-                  <img src={j.photo} alt={j.name} loading="lazy" className="relative h-full w-full rounded-full object-cover ring-4 ring-white shadow-[var(--shadow-card)] transition duration-500 group-hover:scale-[1.04] group-hover:ring-yellow" />
+        <section id="judges" className="relative isolate overflow-hidden bg-hero-gradient text-white">
+          <img src={sphereArt} alt="" aria-hidden className="orb pointer-events-none absolute -left-24 -top-24 -z-10 w-[260px] opacity-60 lg:w-[340px]" />
+          <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 md:py-24">
+            <p data-reveal className="text-sm font-semibold text-yellow">Demo Day · {EVENT_DAY_SHORT}</p>
+            <h2 data-reveal className="mt-2 text-3xl font-bold md:text-5xl">Who You'll Meet</h2>
+            <div className="mt-12 grid grid-cols-2 justify-items-center gap-x-6 gap-y-10 md:grid-cols-4">
+              {JUDGES.map((j, i) => (
+                <div key={j.name} data-reveal style={{ "--rd": `${i * 90}ms` } as CSSProperties} className="group flex flex-col items-center text-center">
+                  <img
+                    src={j.photo}
+                    alt={j.name}
+                    loading="lazy"
+                    className="h-32 w-32 rounded-full object-cover ring-4 ring-white/90 grayscale transition duration-500 group-hover:scale-105 group-hover:ring-yellow md:h-40 md:w-40"
+                  />
+                  <div className="mt-4 font-display text-lg font-bold uppercase tracking-wide text-yellow">{j.name}</div>
+                  {j.title && <div className="mt-1 max-w-[15rem] text-sm leading-snug text-white/85">{j.title}</div>}
+                  <div className="mt-0.5 max-w-[15rem] text-balance text-sm font-semibold leading-snug">{j.org}</div>
                 </div>
-                <div className="mt-4 font-display text-lg font-bold text-navy">{j.name}</div>
-                {j.title && <div className="text-sm text-muted-foreground">{j.title}</div>}
-                <div className="text-sm font-semibold text-primary">{j.org}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
       )}
