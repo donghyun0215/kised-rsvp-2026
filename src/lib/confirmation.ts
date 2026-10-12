@@ -154,15 +154,15 @@ export function buildConfirmation(input: ConfirmationInput): ConfirmationEmail {
   // ── HTML
   const F = "font-family:Arial,Helvetica,sans-serif;";
   const link = (href: string, label: string) =>
-    `<a href="${esc(href)}" style="color:#1e6b4f;font-weight:bold;text-decoration:underline;">${esc(label)}</a>`;
+    `<a href="${esc(href)}" style="color:#3b49c2;font-weight:bold;text-decoration:underline;">${esc(label)}</a>`;
   const block = (kicker: string, rows: string[], venue: string, address: string, map: string, cal: string, note?: string) => `
     <tr><td style="padding:0 32px 18px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #d5ded7;border-left:5px solid #1e6b4f;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #d9deec;border-left:5px solid #3b49c2;">
         <tr><td style="padding:16px 18px;">
-          <div style="${F}font-size:11px;letter-spacing:1.2px;font-weight:bold;color:#1e6b4f;text-transform:uppercase;">${esc(kicker)}</div>
-          ${rows.map((r) => `<div style="${F}padding-top:8px;font-size:15px;line-height:21px;color:#0f2f2a;font-weight:bold;">${r}</div>`).join("")}
-          <div style="${F}padding-top:10px;font-size:13px;line-height:19px;color:#4b5b57;">${esc(venue)}<br>${esc(address)}</div>
-          ${note ? `<div style="${F}padding-top:6px;font-size:12px;line-height:17px;color:#4b5b57;">${esc(note)}</div>` : ""}
+          <div style="${F}font-size:11px;letter-spacing:1.2px;font-weight:bold;color:#3b49c2;text-transform:uppercase;">${esc(kicker)}</div>
+          ${rows.map((r) => `<div style="${F}padding-top:8px;font-size:15px;line-height:21px;color:#12162b;font-weight:bold;">${r}</div>`).join("")}
+          <div style="${F}padding-top:10px;font-size:13px;line-height:19px;color:#4f566e;">${esc(venue)}<br>${esc(address)}</div>
+          ${note ? `<div style="${F}padding-top:6px;font-size:12px;line-height:17px;color:#4f566e;">${esc(note)}</div>` : ""}
           <div style="${F}padding-top:10px;font-size:13px;line-height:19px;">${map ? `${link(map, "Open in Google Maps")} &nbsp;·&nbsp; ` : ""}${link(cal, "Add to Google Calendar")}</div>
         </td></tr>
       </table>
@@ -176,37 +176,37 @@ ${personal.map((l) => `<p style="${P}">${esc(l)}</p>`).join("\n")}
 <p style="${P}">Best,<br>The LodestarT team</p>
 </div>`
     : "";
-  const pageBg = personal ? "#ffffff" : "#f2f5f1";
+  const pageBg = personal ? "#ffffff" : "#f3f5fb";
   const html = `<!doctype html><html><body style="margin:0;padding:0;background:${pageBg};">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${pageBg};"><tr><td style="padding:${personal ? "16px" : "20px"} 12px;">
 ${personalHtml}
-<table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;${personal ? "border:1px solid #d5ded7;" : ""}">
-  <tr><td style="background:#1e6b4f;padding:22px 32px;">
+<table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;${personal ? "border:1px solid #d9deec;" : ""}">
+  <tr><td style="background:#3b49c2;padding:22px 32px;">
     <div style="${F}font-size:10px;letter-spacing:1px;font-weight:bold;color:#ffffff;text-transform:uppercase;">MSS · KISED | Climate Tech Startup Challenge</div>
     <div style="${F}padding-top:8px;font-size:24px;line-height:28px;font-weight:800;color:#ffffff;">${esc(copy.headline)}</div>
-    <div style="${F}padding-top:4px;font-size:13px;font-weight:bold;color:#e9a82b;">Climate Tech IR / Demo Day · 28–29 October 2026</div>
+    <div style="${F}padding-top:4px;font-size:13px;font-weight:bold;color:#7fd3f2;">Climate Tech IR / Demo Day · 28–29 October 2026</div>
   </td></tr>
-  ${personal ? `<tr><td style="padding:20px 32px 0;"></td></tr>` : `<tr><td style="padding:24px 32px 16px;${F}font-size:15px;line-height:22px;color:#0f2f2a;">
+  ${personal ? `<tr><td style="padding:20px 32px 0;"></td></tr>` : `<tr><td style="padding:24px 32px 16px;${F}font-size:15px;line-height:22px;color:#12162b;">
     Dear <strong>${esc(input.fullName)}</strong>,<br><br>
     ${copy.intro}
   </td></tr>`}
   ${demoDay.length ? block("Wed 28 Oct · Demo Day", demoDay.map(esc), EVENT_VENUE, EVENT_ADDRESS, EVENT_MAP_URL, demoCal) : ""}
   ${meetings.length ? block("Thu 29 Oct · 1:1 Business Meetings", meetings.map((m) => `${esc(m.round)} · ${esc(m.time)} — ${esc(m.company)}`), MEETUP_VENUE, MEETUP_ADDRESS, MEETUP_MAP_URL, meetupsCal, "Please arrive 5–10 minutes before your first meeting.") : ""}
-  ${onTheDay ? `<tr><td style="padding:0 32px 16px;${F}font-size:14px;line-height:21px;color:#0f2f2a;">
-    <div style="${F}font-size:11px;letter-spacing:1.2px;font-weight:bold;color:#1e6b4f;text-transform:uppercase;padding-bottom:6px;">On the day</div>
+  ${onTheDay ? `<tr><td style="padding:0 32px 16px;${F}font-size:14px;line-height:21px;color:#12162b;">
+    <div style="${F}font-size:11px;letter-spacing:1.2px;font-weight:bold;color:#3b49c2;text-transform:uppercase;padding-bottom:6px;">On the day</div>
     <b>Check-in:</b> scan the QR code at the entrance and enter this email address to collect your name badge — please keep this email handy.<br>
     <b>Networking Lounge:</b> a private, attendee-only directory of everyone in the room, so conversations can continue after the event. ${link(`${SITE}/lounge`, "Open the lounge")}
   </td></tr>` : ""}
-  ${nudge ? `<tr><td style="padding:0 32px 16px;${F}font-size:14px;line-height:21px;color:#0f2f2a;">
-    <div style="background:#fbf1dc;border:1px solid #e9a82b;padding:12px 14px;">A few <b>1:1 meeting slots on Thu 29 Oct</b> are still open — ${link(`${SITE}/book?day=5`, "book a meeting")}.</div>
+  ${nudge ? `<tr><td style="padding:0 32px 16px;${F}font-size:14px;line-height:21px;color:#12162b;">
+    <div style="background:#e7f6fc;border:1px solid #7fd3f2;padding:12px 14px;">A few <b>1:1 meeting slots on Thu 29 Oct</b> are still open — ${link(`${SITE}/book?day=5`, "book a meeting")}.</div>
   </td></tr>` : ""}
-  <tr><td style="padding:4px 32px 22px;${F}font-size:14px;line-height:21px;color:#0f2f2a;">
+  <tr><td style="padding:4px 32px 22px;${F}font-size:14px;line-height:21px;color:#12162b;">
     ${link(`${SITE}/book#manage`, "View or cancel your 1:1 meetings")}<br>
     ${link(`${SITE}/#startups`, "Browse the startup one-pagers")}<br><br>
     Need to change something? Re-submit the RSVP form with the same email, or simply reply to this email.
   </td></tr>
-  ${personal ? "" : `<tr><td style="background:#f2f5f1;border-top:1px solid #d5ded7;padding:18px 32px;${F}font-size:14px;line-height:20px;color:#0f2f2a;">
-    Warm regards,<br><strong style="color:#1e6b4f;">LodestarT team</strong><br><span style="font-size:12px;color:#4b5b57;">for the 2026 Climate Tech Startup Challenge</span>
+  ${personal ? "" : `<tr><td style="background:#f3f5fb;border-top:1px solid #d9deec;padding:18px 32px;${F}font-size:14px;line-height:20px;color:#12162b;">
+    Warm regards,<br><strong style="color:#3b49c2;">LodestarT team</strong><br><span style="font-size:12px;color:#4f566e;">for the 2026 Climate Tech Startup Challenge</span>
   </td></tr>`}
 </table></td></tr></table></body></html>`;
 

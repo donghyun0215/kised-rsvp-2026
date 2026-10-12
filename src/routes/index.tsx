@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, type CSSProperties } from "react";
-import mssLogo from "@/assets/logos/mss.png";
-import kisedLogo from "@/assets/logos/kised.png";
+import { useEffect, useState, type CSSProperties } from "react";
+import mssLogo from "@/assets/ci/mss-white.png";
+import kisedLogo from "@/assets/ci/kised-white.png";
+import sphereArt from "@/assets/ci/sphere.webp";
+import horizonArt from "@/assets/ci/horizon.webp";
 import { Wordmark } from "@/components/Wordmark";
 import { JUDGES } from "@/data/speakers";
 import { companies } from "@/data/companies";
@@ -91,11 +93,44 @@ function Place({ venue, address, map }: { venue: string; address: string; map: s
   );
 }
 
+// Scroll reveal: marks [data-reveal] elements visible as they enter.
+function useReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll<HTMLElement>("[data-reveal]");
+    if (!("IntersectionObserver" in window)) return;
+    document.documentElement.classList.add("reveal-ready");
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add("is-visible"), io.unobserve(e.target))),
+      { rootMargin: "0px 0px -8% 0px" },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+}
+
+// CI artwork from the event banner: textured spheres and thin rings.
+function Orbs() {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      {/* small sphere top-centre, dome rising from the bottom-right edge —
+          the X-banner composition, kept clear of the copy */}
+      <img src={sphereArt} alt="" className="orb absolute -top-[56px] left-[46%] w-[170px] opacity-95 max-lg:left-auto max-lg:right-[-40px] max-lg:top-[-60px] max-lg:w-[140px]" />
+      <img src={horizonArt} alt="" className="orb orb-slow absolute -bottom-[300px] -right-[420px] w-[820px] opacity-70 lg:-bottom-[400px] lg:-right-[380px] lg:w-[1100px]" />
+      {/* rings sit in the page margins / empty band under the CTAs only */}
+      <span className="ring-drift absolute left-[2.5%] top-[46%] hidden h-5 w-5 rounded-full border border-white/50 lg:block" />
+      <span className="ring-drift absolute bottom-[9%] left-[30%] hidden h-9 w-9 rounded-full border border-white/40 [animation-delay:-5s] lg:block" />
+      <span className="ring-drift absolute right-[3%] top-[38%] hidden h-4 w-4 rounded-full border border-white/50 [animation-delay:-9s] lg:block" />
+    </div>
+  );
+}
+
 function Landing() {
+  useReveal();
   return (
     <div className="min-h-screen">
       {/* HERO — the ledger */}
-      <section id="top" className="bg-hero-gradient text-white">
+      <section id="top" className="relative isolate overflow-hidden bg-hero-gradient text-white">
+        <Orbs />
         {/* Phones: wordmark row, then the menu row (four items never fit
             beside the wordmark at 390px); from md they share one line. */}
         <header className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between">
@@ -110,7 +145,7 @@ function Landing() {
           </nav>
         </header>
 
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:pb-24 lg:pt-14">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 pb-32 pt-8 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:pb-44 lg:pt-14">
           <div className="lg:pt-4">
             <p className="text-sm font-medium text-lichen">Climate Tech IR / Demo Day · {EVENT_DAY_SHORT} 2026</p>
             <h1 className="hero-title mt-4 text-[clamp(2.6rem,9vw,5.2rem)] font-bold leading-[0.92] text-white">
@@ -162,12 +197,12 @@ function Landing() {
       {/* JOIN — two days. One big line per card says what matters (day + time);
           everything else is small. Details repeat on the RSVP page. */}
       <section id="rsvp" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
-        <h2 className="max-w-xl text-3xl font-bold text-navy md:text-4xl">Two days in Singapore</h2>
+        <h2 data-reveal className="max-w-xl text-3xl font-bold text-navy md:text-4xl">Two days in Singapore</h2>
         <p className="mt-3 max-w-xl text-muted-foreground">
           For investors, corporates and ecosystem partners. Register for either day or both.
         </p>
 
-        <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2">
+        <div data-reveal className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border bg-border shadow-[var(--shadow-card)] md:grid-cols-2">
           <article className="flex flex-col bg-card p-6 sm:p-8">
             <h3 className="text-xl font-semibold text-muted-foreground">Demo Day</h3>
             <p className="mt-2 font-display text-[clamp(2rem,4.5vw,3rem)] font-bold leading-none tracking-tight text-navy">
@@ -215,14 +250,14 @@ function Landing() {
       {/* STARTUPS */}
       <section id="startups" className="border-t border-border bg-secondary/50">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
-          <h2 className="text-3xl font-bold text-navy md:text-4xl">The startups</h2>
+          <h2 data-reveal className="text-3xl font-bold text-navy md:text-4xl">The startups</h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">
             Open a profile for the full one-pager, or book a 1:1 straight away.
           </p>
 
           <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
-            {companies.map((c) => (
-              <article key={c.slug} className="card-startup group flex flex-col overflow-hidden rounded-xl">
+            {companies.map((c, i) => (
+              <article key={c.slug} data-reveal style={{ "--rd": `${(i % 5) * 70}ms` } as CSSProperties} className="card-startup group flex flex-col overflow-hidden rounded-xl">
                 <Link to="/companies/$slug" params={{ slug: c.slug }} className="block aspect-[3/2] overflow-hidden bg-muted">
                   <img
                     src={STARTUP_IMAGES[c.slug]}
@@ -279,8 +314,9 @@ function Landing() {
       )}
 
       {/* HOSTS — MSS and KISED only for now (client request, 10 Oct) */}
-      <section id="about" className="bg-navy text-white">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20">
+      <section id="about" className="relative isolate overflow-hidden bg-hero-gradient text-white">
+        <img src={sphereArt} alt="" aria-hidden className="orb pointer-events-none absolute -right-28 -top-28 -z-10 w-[260px] opacity-70 lg:-right-16 lg:w-[360px]" />
+        <div data-reveal className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20">
           <h2 className="max-w-2xl text-2xl font-bold md:text-3xl">About the 2026 Climate Tech Startup Challenge</h2>
           <p className="mt-4 max-w-2xl leading-relaxed text-white/80">
             A government-backed Korean programme that helps early-stage climate tech startups enter global markets, get
@@ -292,8 +328,8 @@ function Landing() {
             <p className="text-sm font-medium text-lichen">Hosted by</p>
             <div className="mt-4 grid gap-8 md:grid-cols-2">
               <div>
-                <a href={MSS_SITE} target="_blank" rel="noopener noreferrer" className="flex h-20 items-center justify-center rounded-xl bg-white p-3">
-                  <img src={mssLogo} alt="Ministry of SMEs and Startups" className="max-h-full max-w-full object-contain" />
+                <a href={MSS_SITE} target="_blank" rel="noopener noreferrer" className="flex h-14 items-center">
+                  <img src={mssLogo} alt="Ministry of SMEs and Startups" className="h-11 w-auto object-contain" />
                 </a>
                 <p className="mt-4 font-display text-lg font-semibold leading-snug">Ministry of SMEs and Startups (MSS)</p>
                 <p className="mt-2 text-sm leading-relaxed text-white/75">
@@ -302,8 +338,8 @@ function Landing() {
                 </p>
               </div>
               <div>
-                <a href={KISED_SITE} target="_blank" rel="noopener noreferrer" className="flex h-20 items-center justify-center rounded-xl bg-white p-3">
-                  <img src={kisedLogo} alt="Korea Institute of Startup & Entrepreneurship Development (KISED)" className="max-h-full max-w-full object-contain" />
+                <a href={KISED_SITE} target="_blank" rel="noopener noreferrer" className="flex h-14 items-center">
+                  <img src={kisedLogo} alt="Korea Institute of Startup & Entrepreneurship Development (KISED)" className="h-10 w-auto object-contain" />
                 </a>
                 <p className="mt-4 font-display text-lg font-semibold leading-snug">Korea Institute of Startup &amp; Entrepreneurship Development (KISED)</p>
                 <p className="mt-2 text-sm leading-relaxed text-white/75">

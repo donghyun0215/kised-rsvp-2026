@@ -2,9 +2,9 @@
 @source "../src";
 @import "tw-animate-css";
 
-/* Typefaces load from Google Fonts in __root.tsx: Bricolage Grotesque for
-   headlines (its width/optical axes carry the page's personality) and
-   Instrument Sans for running text. */
+/* Typefaces load from Google Fonts in __root.tsx: Outfit for headlines (a
+   round geometric sans close to the CI banner lettering) and Instrument
+   Sans for running text. */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -39,48 +39,48 @@
   --color-yellow: var(--yellow);
   --color-yellow-foreground: var(--yellow-foreground);
   --font-sans: "Instrument Sans", system-ui, sans-serif;
-  --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
+  --font-display: "Outfit", "Instrument Sans", system-ui, sans-serif;
 }
 
 :root {
   --radius: 0.75rem;
-  /* Climate Tech Startup Challenge palette (own concept until KISED supplies
-     a programme theme — swap these tokens and every page follows).
-     Spruce #0F2F2A ink · Canopy #1E6B4F primary · Lichen #D7EBD9 soft
-     surface · Mineral #F2F5F1 page · Solar amber #E9A82B, used sparingly.
-     Token names (navy / yellow / light-blue) are kept from the shared
-     codebase so components need no renaming. */
-  --background: #f2f5f1;
-  --foreground: #0f2f2a;
+  /* KISED "모두의 챌린지 기후테크" CI (X-banner / banner, 12 Oct): deep
+     night navy with glowing cyan-to-indigo spheres and thin white rings.
+     Night #12162B ink/dark sections · Indigo #3B49C2 primary (from the
+     sphere's shadow side) · Sky #6CC7EE accent (its lit side, dark
+     backgrounds only) · Mist #F3F5FB page. Token names (navy / yellow /
+     light-blue) are kept from the shared codebase. */
+  --background: #f3f5fb;
+  --foreground: #12162b;
   --card: #ffffff;
-  --card-foreground: #0f2f2a;
+  --card-foreground: #12162b;
   --popover: #ffffff;
-  --popover-foreground: #0f2f2a;
-  --primary: #1e6b4f;
+  --popover-foreground: #12162b;
+  --primary: #3b49c2;
   --primary-foreground: #ffffff;
-  --primary-glow: #2f8f6a;
-  --navy: #0f2f2a;
-  --light-blue: #d7ebd9;
-  --yellow: #e9a82b;
-  --yellow-foreground: #0f2f2a;
-  --secondary: #e4efe5;
-  --secondary-foreground: #0f2f2a;
-  --muted: #e9efe9;
-  --muted-foreground: #4b5b57;
-  --accent: #d7ebd9;
-  --accent-foreground: #0f2f2a;
+  --primary-glow: #5b74e0;
+  --navy: #12162b;
+  --light-blue: #c9d6fb;
+  --yellow: #7fd3f2;
+  --yellow-foreground: #0e1226;
+  --secondary: #e7ebf8;
+  --secondary-foreground: #12162b;
+  --muted: #eceff8;
+  --muted-foreground: #4f566e;
+  --accent: #dfe6fb;
+  --accent-foreground: #12162b;
   --destructive: #c2410c;
   --destructive-foreground: #ffffff;
-  --border: #d5ded7;
-  --input: #c9d4cc;
-  --ring: #1e6b4f;
+  --border: #d9deec;
+  --input: #cbd2e6;
+  --ring: #3b49c2;
 
-  --gradient-hero: linear-gradient(180deg, #0f2f2a 0%, #123a33 100%);
+  --gradient-hero: radial-gradient(120% 90% at 85% 0%, #222a5c 0%, #151a33 45%, #0c0f1f 100%);
   --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%);
-  --gradient-wave: linear-gradient(180deg, transparent 0%, #e4efe5 100%);
-  --shadow-elegant: 0 18px 40px -24px rgb(15 47 42 / 0.45);
-  --shadow-card: 0 1px 0 rgb(15 47 42 / 0.06), 0 8px 24px -18px rgb(15 47 42 / 0.35);
-  --shadow-glow: 0 0 0 4px rgb(233 168 43 / 0.25);
+  --gradient-wave: linear-gradient(180deg, transparent 0%, #e7ebf8 100%);
+  --shadow-elegant: 0 18px 40px -22px rgb(18 22 43 / 0.45);
+  --shadow-card: 0 1px 0 rgb(18 22 43 / 0.05), 0 10px 26px -18px rgb(18 22 43 / 0.35);
+  --shadow-glow: 0 0 0 4px rgb(127 211 242 / 0.25);
 }
 
 @layer base {
@@ -119,7 +119,7 @@
 }
 
 @utility btn-hero {
-  /* Solar-amber CTA on the spruce hero */
+  /* Sky CTA on the night hero */
   background: var(--yellow);
   color: var(--yellow-foreground);
   box-shadow: 0 12px 30px -12px color-mix(in oklab, var(--yellow) 60%, transparent);
@@ -162,12 +162,10 @@
 }
 
 
-/* Home hero. The headline uses Bricolage's narrow width so ten words stay
-   at display size; the ledger rows arrive once on load, each arrow drawing
-   from left to right — the page's only unprompted motion. */
+/* Home hero: ledger rows arrive once on load, each arrow drawing left to
+   right; the CI spheres drift slowly behind. */
 .hero-title {
-  font-variation-settings: "wdth" 88, "opsz" 96;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 .ledger-row {
@@ -196,4 +194,34 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .ledger-row, .ledger-row .ledger-arrow { animation: none; }
+}
+
+/* CI artwork: spheres float, thin rings drift. Slow on purpose — ambient,
+   never competing with the copy. */
+.orb { animation: orb-float 14s ease-in-out infinite alternate; will-change: transform; }
+.orb-slow { animation-duration: 20s; animation-delay: -6s; }
+.ring-drift { animation: ring-drift 18s ease-in-out infinite alternate; }
+@keyframes orb-float {
+  from { transform: translate3d(0, 0, 0) rotate(0deg); }
+  to { transform: translate3d(-14px, 18px, 0) rotate(6deg); }
+}
+@keyframes ring-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(10px, -12px, 0); }
+}
+
+/* Scroll reveal (as on the CMK site). Hidden state applies only after JS
+   adds .reveal-ready, so SSR / no-JS visitors always see content. */
+.reveal-ready [data-reveal]:not(.is-visible) {
+  opacity: 0;
+  transform: translateY(28px);
+}
+[data-reveal] {
+  transition: opacity 0.8s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--rd, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .orb, .ring-drift { animation: none; }
+  [data-reveal] { transition: none; }
+  .reveal-ready [data-reveal]:not(.is-visible) { opacity: 1; transform: none; }
 }

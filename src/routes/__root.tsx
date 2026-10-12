@@ -81,7 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       // Light-only: stops Samsung Internet / Chrome "auto dark" from inverting the CI colours
       { name: "color-scheme", content: "only light" },
-      { name: "theme-color", content: "#0F2F2A" },
+      { name: "theme-color", content: "#12162B" },
       // Invite-only event site: keep it out of search engines (6 Oct)
       { name: "robots", content: "noindex, nofollow" },
       { title: "2026 Climate Tech Startup Challenge · Singapore" },
@@ -97,7 +97,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Instrument+Sans:wght@400..700&display=swap" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Outfit:wght@400..800&family=Instrument+Sans:wght@400..700&display=swap" },
       // Leaf-mark favicon. SVG for modern browsers, PNG/ICO fallbacks,
       // apple-touch for iOS home screens.
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },

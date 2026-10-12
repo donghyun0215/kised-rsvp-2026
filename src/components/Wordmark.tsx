@@ -4,9 +4,9 @@ export function Wordmark({ light = false, compact = false }: { light?: boolean; 
   return (
     <span className={`inline-flex items-center gap-2 font-display font-bold tracking-tight ${light ? "text-white" : "text-navy"}`}>
       <svg viewBox="0 0 512 512" className="h-6 w-6 shrink-0" aria-hidden>
-        <rect width="512" height="512" rx="104" fill={light ? "#ffffff" : "#0F2F2A"} />
-        <path d="M136 312a124 124 0 0 1 212-128" fill="none" stroke={light ? "#1E6B4F" : "#D7EBD9"} strokeWidth="44" strokeLinecap="round" />
-        <path d="M376 200a124 124 0 0 1-212 128" fill="none" stroke="#E9A82B" strokeWidth="44" strokeLinecap="round" />
+        <rect width="512" height="512" rx="104" fill={light ? "#ffffff" : "#12162B"} />
+        <path d="M136 312a124 124 0 0 1 212-128" fill="none" stroke={light ? "#3B49C2" : "#7FD3F2"} strokeWidth="44" strokeLinecap="round" />
+        <path d="M376 200a124 124 0 0 1-212 128" fill="none" stroke="#5B74E0" strokeWidth="44" strokeLinecap="round" />
       </svg>
       <span className={`text-[15px] leading-none sm:text-base ${compact ? "max-sm:sr-only" : ""}`}>
         Climate Tech Startup Challenge

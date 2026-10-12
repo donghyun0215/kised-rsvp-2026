@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Wordmark } from "@/components/Wordmark";
+import sphereArt from "@/assets/ci/sphere.webp";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { companies, MEETUP_COMPANIES } from "@/data/companies";
@@ -379,7 +380,8 @@ function RsvpPage() {
       </header>
 
       {/* HERO */}
-      <section className="bg-hero-gradient text-primary-foreground">
+      <section className="relative isolate overflow-hidden bg-hero-gradient text-primary-foreground">
+        <img src={sphereArt} alt="" aria-hidden className="orb pointer-events-none absolute -right-16 -top-16 -z-10 w-[200px] opacity-80 sm:-right-10 sm:w-[300px]" />
         <div className="mx-auto max-w-5xl px-5 py-10 sm:px-6 sm:py-12">
           <div className="text-sm font-semibold text-primary-foreground/70">
             {day === "5" ? "RSVP · 1:1 business meetings" : "RSVP · Demo Day"}

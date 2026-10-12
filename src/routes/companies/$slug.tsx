@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Wordmark } from "@/components/Wordmark";
+import sphereArt from "@/assets/ci/sphere.webp";
 import { getCompanyBySlug, TRACKS } from "@/data/companies";
 import { EVENT_DATE, EVENT_VENUE, ONE_ON_ONE_OPEN, MEETUP_DATE, EVENT_NAME } from "@/data/timeslots";
 import { STARTUP_LOGOS } from "@/data/companyImages";
@@ -93,6 +94,7 @@ function CompanyOnePager() {
 
       {/* COMPACT HERO */}
       <section className="relative isolate overflow-hidden bg-hero-gradient text-primary-foreground">
+        <img src={sphereArt} alt="" aria-hidden className="orb pointer-events-none absolute -right-16 -top-16 -z-10 w-[200px] opacity-80 sm:-right-10 sm:w-[300px]" />
         <div
           className="absolute inset-0 -z-10 opacity-25"
           style={{
