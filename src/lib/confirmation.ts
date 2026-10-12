@@ -111,7 +111,7 @@ export function buildConfirmation(input: ConfirmationInput): ConfirmationEmail {
 
   const meetupsCal = gcal(
     "Climate Tech Startup Challenge · 1:1 Business Meetings",
-    "20261029T100000/20261029T120000",
+    "20261029T103000/20261029T120000",
     `${MEETUP_VENUE}, ${MEETUP_ADDRESS}`,
     ["Your 1:1 meetings:", ...meetings.map((m) => `• ${m.round} ${m.time} — ${m.company}`), "", `Manage: ${SITE}/book#manage`].join("\n"),
   );

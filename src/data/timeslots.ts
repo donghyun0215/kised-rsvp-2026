@@ -34,17 +34,14 @@ export const EVENT_MAP_URL =
 // Public 1:1 self-booking, same model as KIMST/CMK.
 export const ONE_ON_ONE_OPEN = true;
 
-// 1:1 meetings Thu 29 Oct 10:00–12:00, "about 30 min each, at least two per
-// startup" (timetable 0921). Four 25-min rounds with a 5-min changeover fit
-// that window. IDs are stable references stored in bookings — change
-// labels/times freely, never the ids.
+// 1:1 meetings Thu 29 Oct: two rounds starting 10:30 and 11:20 (Lodestart
+// internship sheet, 12 Oct), 40 min each like CMK. IDs are stable references
+// stored in bookings — change labels/times freely, never the ids.
 export const TIMESLOTS: Timeslot[] = [
-  { id: "slot1", label: "Round 1", time: "10:00 – 10:25" },
-  { id: "slot2", label: "Round 2", time: "10:30 – 10:55" },
-  { id: "slot3", label: "Round 3", time: "11:00 – 11:25" },
-  { id: "slot4", label: "Round 4", time: "11:30 – 11:55" },
+  { id: "slot1", label: "Round 1", time: "10:30 – 11:10" },
+  { id: "slot2", label: "Round 2", time: "11:20 – 12:00" },
 ];
-export const MEETUP_TIME = "10:00 – 12:00";
+export const MEETUP_TIME = "10:30 – 12:00";
 export const MEETUP_DATE = "Thursday, 29 October 2026";
 export const MEETUP_DAY_SHORT = "Thu 29 Oct";
 // Plan A is a NULDAM café buy-out (1:1s + one-pager display); not booked yet.
