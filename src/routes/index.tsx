@@ -108,24 +108,75 @@ function useReveal() {
   }, []);
 }
 
+// Pointer parallax for the hero art and scroll parallax for the dome:
+// writes --mx/--my (−1..1) and --sy (px) on #top; CSS does the moving.
+function useHeroParallax() {
+  useEffect(() => {
+    const hero = document.getElementById("top");
+    if (!hero || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0, mx = 0, my = 0;
+    const paint = () => {
+      hero.style.setProperty("--mx", mx.toFixed(3));
+      hero.style.setProperty("--my", my.toFixed(3));
+      hero.style.setProperty("--sy", `${Math.min(scrollY, 900) * 0.25}px`);
+      raf = 0;
+    };
+    const queue = () => { if (!raf) raf = requestAnimationFrame(paint); };
+    const onMove = (e: PointerEvent) => { mx = (e.clientX / innerWidth) * 2 - 1; my = (e.clientY / innerHeight) * 2 - 1; queue(); };
+    addEventListener("pointermove", onMove, { passive: true });
+    addEventListener("scroll", queue, { passive: true });
+    return () => { removeEventListener("pointermove", onMove); removeEventListener("scroll", queue); cancelAnimationFrame(raf); };
+  }, []);
+}
+
+// 3D tilt + light sheen for [data-tilt] cards, magnetic pull for [data-magnet].
+function useTiltAndMagnet() {
+  useEffect(() => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches || matchMedia("(hover: none)").matches) return;
+    const onMove = (e: PointerEvent) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>("[data-tilt],[data-magnet]");
+      if (!t) return;
+      const r = t.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+      if (t.hasAttribute("data-tilt")) {
+        t.style.setProperty("--rx", `${(-y * 6).toFixed(2)}deg`); t.style.setProperty("--ry", `${(x * 8).toFixed(2)}deg`);
+        t.style.setProperty("--px", `${((x + 0.5) * 100).toFixed(1)}%`); t.style.setProperty("--py", `${((y + 0.5) * 100).toFixed(1)}%`);
+      } else {
+        t.style.setProperty("--tx", `${(x * 14).toFixed(1)}px`); t.style.setProperty("--ty", `${(y * 10).toFixed(1)}px`);
+      }
+    };
+    const onLeave = (e: PointerEvent) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>("[data-tilt],[data-magnet]");
+      if (t) ["--rx", "--ry", "--tx", "--ty"].forEach((v) => t.style.removeProperty(v));
+    };
+    addEventListener("pointermove", onMove, { passive: true });
+    addEventListener("pointerout", onLeave, { passive: true });
+    return () => { removeEventListener("pointermove", onMove); removeEventListener("pointerout", onLeave); };
+  }, []);
+}
+
+const HEADLINE = ["Ten", "Korean", "startups", "turning", "waste", "into", "markets"];
+
 // CI artwork from the event banner: textured spheres and thin rings.
 function Orbs() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
       {/* small sphere top-centre, dome rising from the bottom-right edge —
           the X-banner composition, kept clear of the copy */}
-      <img src={sphereArt} alt="" className="orb absolute -top-[56px] left-[46%] w-[170px] opacity-95 max-lg:left-auto max-lg:right-[-40px] max-lg:top-[-60px] max-lg:w-[140px]" />
-      <img src={horizonArt} alt="" className="orb orb-slow absolute -bottom-[300px] -right-[420px] w-[820px] opacity-70 lg:-bottom-[400px] lg:-right-[380px] lg:w-[1100px]" />
+      <img src={sphereArt} alt="" className="orb orb-glow parallax-1 absolute -top-[56px] left-[46%] w-[170px] opacity-95 max-lg:left-auto max-lg:right-[-40px] max-lg:top-[-60px] max-lg:w-[140px]" />
+      <img src={horizonArt} alt="" className="orb orb-slow orb-glow parallax-dome absolute -bottom-[300px] -right-[420px] w-[820px] opacity-70 lg:-bottom-[400px] lg:-right-[380px] lg:w-[1100px]" />
       {/* rings sit in the page margins / empty band under the CTAs only */}
-      <span className="ring-drift absolute left-[2.5%] top-[46%] hidden h-5 w-5 rounded-full border border-white/50 lg:block" />
-      <span className="ring-drift absolute bottom-[9%] left-[30%] hidden h-9 w-9 rounded-full border border-white/40 [animation-delay:-5s] lg:block" />
-      <span className="ring-drift absolute right-[3%] top-[38%] hidden h-4 w-4 rounded-full border border-white/50 [animation-delay:-9s] lg:block" />
+      <span className="ring-drift parallax-2 absolute left-[2.5%] top-[46%] hidden h-5 w-5 rounded-full border border-white/50 lg:block" />
+      <span className="ring-drift parallax-3 absolute bottom-[9%] left-[30%] hidden h-9 w-9 rounded-full border border-white/40 [animation-delay:-5s] lg:block" />
+      <span className="ring-drift parallax-2 absolute right-[3%] top-[38%] hidden h-4 w-4 rounded-full border border-white/50 [animation-delay:-9s] lg:block" />
     </div>
   );
 }
 
 function Landing() {
   useReveal();
+  useHeroParallax();
+  useTiltAndMagnet();
   return (
     <div className="min-h-screen">
       {/* HERO — the ledger */}
@@ -147,20 +198,26 @@ function Landing() {
 
         <div className="mx-auto grid max-w-7xl gap-12 px-4 pb-32 pt-8 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:pb-44 lg:pt-14">
           <div className="lg:pt-4">
-            <p className="text-sm font-medium text-lichen">Climate Tech IR / Demo Day · {EVENT_DAY_SHORT} 2026</p>
-            <h1 className="hero-title mt-4 text-[clamp(2.6rem,9vw,5.2rem)] font-bold leading-[0.92] text-white">
-              Ten Korean startups turning waste into markets
+            <p className="hero-in text-sm font-medium text-lichen">Climate Tech IR / Demo Day · {EVENT_DAY_SHORT} 2026</p>
+            <h1 className="hero-title mt-4 text-[clamp(2.6rem,9vw,5.2rem)] font-bold leading-[0.92] text-white" aria-label={HEADLINE.join(" ")}>
+              {HEADLINE.map((w, i) => (
+                <span key={w} aria-hidden>
+                  <span className="hero-word-clip">
+                    <span className="hero-word" style={{ "--i": i } as CSSProperties}>{w}</span>
+                  </span>{" "}
+                </span>
+              ))}
             </h1>
-            <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/80">
+            <p className="hero-in [--i:5] mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/80">
               Selected through the 2026 Climate Tech Startup Challenge, Korea's government-backed programme, they come to
               Singapore to meet investors, corporates and partners. Watch them pitch, then sit down with the ones that fit.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/book" search={{ day: "7" }} className="btn-hero rounded-full px-6 py-3.5 text-sm font-semibold">
+            <div className="hero-in [--i:6] mt-8 flex flex-wrap gap-3">
+              <Link to="/book" search={{ day: "7" }} data-magnet className="btn-hero magnet rounded-full px-6 py-3.5 text-sm font-semibold">
                 RSVP for the Demo Day
               </Link>
               {ONE_ON_ONE_OPEN && (
-                <Link to="/book" search={{ day: "5" }} className="btn-outline-hero rounded-full px-6 py-3.5 text-sm font-semibold">
+                <Link to="/book" search={{ day: "5" }} data-magnet className="btn-outline-hero magnet rounded-full px-6 py-3.5 text-sm font-semibold">
                   Book a 1:1 meeting
                 </Link>
               )}
@@ -192,6 +249,17 @@ function Landing() {
             })}
           </ol>
         </div>
+
+        {/* Cohort marquee: the ten logos glide across the foot of the hero */}
+        <div className="marquee relative border-t border-white/10 py-5" aria-hidden>
+          <div className="marquee-track">
+            {[...companies, ...companies].map((c, i) => (
+              <span key={`${c.slug}-${i}`} className="mx-3 inline-flex h-12 w-36 shrink-0 items-center justify-center rounded-lg bg-white/95 px-4">
+                <img src={STARTUP_LOGOS[c.slug]} alt="" className="max-h-7 max-w-full object-contain" />
+              </span>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* JOIN — two days. One big line per card says what matters (day + time);
@@ -202,8 +270,8 @@ function Landing() {
           For investors, corporates and ecosystem partners. Register for either day or both.
         </p>
 
-        <div data-reveal className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-border bg-border shadow-[var(--shadow-card)] md:grid-cols-2">
-          <article className="flex flex-col bg-card p-6 sm:p-8">
+        <div data-reveal className="mt-10 grid gap-px rounded-2xl border border-border bg-border shadow-[var(--shadow-card)] [perspective:1200px] md:grid-cols-2">
+          <article data-tilt className="tilt flex flex-col bg-card p-6 sm:p-8">
             <h3 className="text-xl font-semibold text-muted-foreground">Demo Day</h3>
             <p className="mt-2 font-display text-[clamp(2rem,4.5vw,3rem)] font-bold leading-none tracking-tight text-navy">
               {EVENT_DAY_SHORT}
@@ -222,7 +290,7 @@ function Landing() {
             </div>
           </article>
 
-          <article className="flex flex-col bg-card p-6 sm:p-8">
+          <article data-tilt className="tilt flex flex-col bg-card p-6 sm:p-8">
             <h3 className="text-xl font-semibold text-muted-foreground">1:1 business meetings</h3>
             <p className="mt-2 font-display text-[clamp(2rem,4.5vw,3rem)] font-bold leading-none tracking-tight text-navy">
               {MEETUP_DAY_SHORT}
@@ -255,9 +323,9 @@ function Landing() {
             Open a profile for the full one-pager, or book a 1:1 straight away.
           </p>
 
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
+          <div className="mt-10 grid grid-cols-2 gap-3 [perspective:1200px] sm:gap-4 lg:grid-cols-5">
             {companies.map((c, i) => (
-              <article key={c.slug} data-reveal style={{ "--rd": `${(i % 5) * 70}ms` } as CSSProperties} className="card-startup group flex flex-col overflow-hidden rounded-xl">
+              <article key={c.slug} data-reveal style={{ "--rd": `${(i % 5) * 70}ms` } as CSSProperties} data-tilt className="card-startup tilt group flex flex-col overflow-hidden rounded-xl">
                 <Link to="/companies/$slug" params={{ slug: c.slug }} className="block aspect-[3/2] overflow-hidden bg-muted">
                   <img
                     src={STARTUP_IMAGES[c.slug]}

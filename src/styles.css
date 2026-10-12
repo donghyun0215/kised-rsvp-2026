@@ -225,3 +225,54 @@
   [data-reveal] { transition: none; }
   .reveal-ready [data-reveal]:not(.is-visible) { opacity: 1; transform: none; }
 }
+
+/* ── Motion layer ───────────────────────────────────────────── */
+/* Hero entrance: each headline word rises out of a clip, then the eyebrow,
+   copy and buttons follow (--i orders them). Runs once on load. */
+.hero-word-clip { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.hero-word { display: inline-block; animation: word-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(120ms + var(--i, 0) * 70ms) both; }
+.hero-in { animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) calc(200ms + var(--i, 0) * 90ms) both; }
+@keyframes word-up { from { transform: translateY(110%); } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(14px); } }
+
+/* Pointer parallax (vars set by useHeroParallax). Layers move by different
+   amounts so the scene reads as depth; the dome also sinks on scroll. */
+.parallax-1 { translate: calc(var(--mx, 0) * -18px) calc(var(--my, 0) * -12px); transition: translate 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.parallax-2 { translate: calc(var(--mx, 0) * 10px) calc(var(--my, 0) * 8px); transition: translate 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.parallax-3 { translate: calc(var(--mx, 0) * -6px) calc(var(--my, 0) * 14px); transition: translate 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.parallax-dome { translate: calc(var(--mx, 0) * 24px) calc(var(--my, 0) * 10px - var(--sy, 0px)); transition: translate 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* Spheres breathe: a soft cyan halo swells and fades. */
+.orb-glow { filter: drop-shadow(0 0 24px rgb(108 199 238 / 0.35)); animation-name: orb-float, orb-breathe; animation-duration: 14s, 6s; animation-timing-function: ease-in-out, ease-in-out; animation-iteration-count: infinite, infinite; animation-direction: alternate, alternate; }
+.orb-glow.orb-slow { animation-duration: 20s, 8s; }
+@keyframes orb-breathe {
+  from { filter: drop-shadow(0 0 18px rgb(108 199 238 / 0.25)); }
+  to { filter: drop-shadow(0 0 46px rgb(108 199 238 / 0.6)); }
+}
+
+/* Ledger rows: hover extends the arrow and lights the destination. */
+.ledger-row a { transition: background 0.3s ease; border-radius: 0.5rem; }
+.ledger-row a:hover { background: rgb(255 255 255 / 0.04); }
+.ledger-row .ledger-arrow { transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s ease; }
+.ledger-row a:hover .ledger-arrow { transform: scaleX(1.25); }
+
+/* Logo marquee at the foot of the hero: pauses on hover. */
+.marquee { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+.marquee-track { display: flex; width: max-content; animation: marquee 40s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* Tilt cards: 3D lean toward the pointer plus a travelling sheen. */
+.tilt { position: relative; transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease; transform-style: preserve-3d; }
+.tilt::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: radial-gradient(360px circle at var(--px, 50%) var(--py, 50%), rgb(108 199 238 / 0.18), transparent 60%); opacity: 0; transition: opacity 0.3s ease; }
+.tilt:hover::after { opacity: 1; }
+.card-startup.tilt:hover { transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-4px); }
+
+/* Magnetic buttons: lean a few px toward the pointer, spring back. */
+.magnet { translate: var(--tx, 0px) var(--ty, 0px); transition: translate 0.25s cubic-bezier(0.22, 1, 0.36, 1), transform 0.2s ease, box-shadow 0.2s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-word, .hero-in, .marquee-track, .orb-glow { animation: none; }
+  .parallax-1, .parallax-2, .parallax-3, .parallax-dome, .magnet { translate: 0 0; }
+  .tilt { transform: none; }
+}
