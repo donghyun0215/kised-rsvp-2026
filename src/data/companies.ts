@@ -1,4 +1,4 @@
-// 2026 Climate Tech Startup Challenge (KISED / 창업진흥원) — Singapore cohort.
+// 2026 Climate-tech Startup Challenge (KISED / 창업진흥원) — Singapore cohort.
 // Source: each startup's programme one-pager (Lodestart template, received
 // 9 Oct 2026). Copy follows the companies' own wording (light edits for grammar). The
 // numbering (1–10) follows the one-pager file names and is the display order.
@@ -33,7 +33,7 @@ export interface Company {
 // One cohort on this event; track2 kept empty so shared components compile.
 export const TRACKS = {
   track1: {
-    title: "2026 Climate Tech Startup Challenge",
+    title: "2026 Climate-tech Startup Challenge",
     theme: "Ten Korean climate tech startups selected by the Korea Institute of Startup & Entrepreneurship Development (KISED)",
     dates: "28 – 29 October 2026",
   },

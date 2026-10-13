@@ -32,7 +32,7 @@ export const Route = createFileRoute("/lounge")({
     typeof s.key === "string" && s.key ? { key: s.key } : {},
   head: () => ({
     meta: [
-      { title: "Virtual Networking Lounge — Climate Tech Startup Challenge Singapore" },
+      { title: "Virtual Networking Lounge — Climate-tech Startup Challenge – Global Demo Day" },
       { name: "robots", content: "noindex, nofollow" },
       { name: "description", content: `Attendee networking lounge for the ${EVENT_NAME}.` },
     ],
@@ -443,7 +443,7 @@ function LoungePage() {
               <div className="relative mx-auto flex max-w-6xl flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
                 <Wordmark light />
                 <div>
-                  <div className="text-sm font-bold text-white">Climate Tech IR / Demo Day</div>
+                  <div className="text-sm font-bold text-white">Global Demo Day</div>
                   <div className="mt-1 text-xs text-white/70">Wed 28 Oct 2026 · Singapore</div>
                 </div>
                 <div>

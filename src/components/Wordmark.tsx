@@ -9,8 +9,8 @@ export function Wordmark({ light = false, compact = false }: { light?: boolean; 
         <path d="M376 200a124 124 0 0 1-212 128" fill="none" stroke="#5B74E0" strokeWidth="44" strokeLinecap="round" />
       </svg>
       <span className={`text-[15px] leading-none sm:text-base ${compact ? "max-sm:sr-only" : ""}`}>
-        Climate Tech Startup Challenge
-        {!compact && <span className={`ml-1.5 hidden font-medium sm:inline ${light ? "text-white/70" : "text-muted-foreground"}`}>Singapore 2026</span>}
+        Climate-tech Startup Challenge
+        {!compact && <span className={`ml-1.5 hidden font-medium lg:inline ${light ? "text-white/70" : "text-muted-foreground"}`}>Global Demo Day</span>}
       </span>
     </span>
   );

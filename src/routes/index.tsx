@@ -199,7 +199,7 @@ function Landing() {
 
         <div className="mx-auto grid max-w-7xl gap-12 px-4 pb-32 pt-8 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:pb-44 lg:pt-14">
           <div className="lg:pt-4">
-            <p className="hero-in text-sm font-medium text-lichen">Climate Tech IR / Demo Day · {EVENT_DAY_SHORT} 2026</p>
+            <p className="hero-in text-sm font-medium text-lichen">Global Demo Day · {EVENT_DAY_SHORT} 2026</p>
             <h1 className="hero-title mt-4 text-[clamp(2.6rem,9vw,5.2rem)] font-bold leading-[0.92] text-white" aria-label={HEADLINE.join(" ")}>
               {HEADLINE.map((w, i) => (
                 <span key={w} aria-hidden>
@@ -210,7 +210,7 @@ function Landing() {
               ))}
             </h1>
             <p className="hero-in [--i:5] mt-6 max-w-md text-[1.0625rem] leading-relaxed text-white/80">
-              Selected through the 2026 Climate Tech Startup Challenge, Korea's government-backed programme, they come to
+              Selected through the 2026 Climate-tech Startup Challenge, Korea's government-backed programme, they come to
               Singapore to meet investors, corporates and partners. Watch them pitch, then sit down with the ones that fit.
             </p>
             <div className="hero-in [--i:6] mt-8 flex flex-wrap gap-3">
@@ -397,7 +397,7 @@ function Landing() {
       <section id="about" className="relative isolate overflow-hidden bg-hero-gradient text-white">
         <img src={sphereArt} alt="" aria-hidden className="orb pointer-events-none absolute -right-28 -top-28 -z-10 w-[260px] opacity-70 lg:-right-16 lg:w-[360px]" />
         <div data-reveal className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20">
-          <h2 className="max-w-2xl text-2xl font-bold md:text-3xl">About the 2026 Climate Tech Startup Challenge</h2>
+          <h2 className="max-w-2xl text-2xl font-bold md:text-3xl">About the 2026 Climate-tech Startup Challenge</h2>
           <p className="mt-4 max-w-2xl leading-relaxed text-white/80">
             A government-backed Korean programme that helps early-stage climate tech startups enter global markets, get
             investment-ready and build international partnerships. The ten startups selected in Korea spend 26–29 October in
@@ -424,7 +424,7 @@ function Landing() {
                 <p className="mt-4 font-display text-lg font-semibold leading-snug">Korea Institute of Startup &amp; Entrepreneurship Development (KISED)</p>
                 <p className="mt-2 text-sm leading-relaxed text-white/75">
                   KISED is Korea's public agency for startups under MSS. It runs the national programmes that take founders
-                  from first idea to global expansion, and selected this cohort for the 2026 Climate Tech Startup Challenge.
+                  from first idea to global expansion, and selected this cohort for the 2026 Climate-tech Startup Challenge.
                 </p>
               </div>
             </div>

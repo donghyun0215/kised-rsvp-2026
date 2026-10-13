@@ -4,7 +4,7 @@ export interface Timeslot {
   time: string;
 }
 
-// ── 2026 Climate Tech Startup Challenge · Singapore (KISED / 창업진흥원) ──
+// ── 2026 Climate-tech Startup Challenge – Global Demo Day (KISED / 창업진흥원) ──
 // Everything event-specific lives in this file, so a confirmed venue or time
 // is a one-line change. Source: MYSC master sheet "창진원 2026년 기후테크
 // 스타트업 챌린지" (timetable 0921, To-Do, Temasek Shophouse form), read
@@ -16,10 +16,10 @@ export const SITE_URL = "https://kised-rsvp-2026.vercel.app";
 // 10 Oct). MYSC / LodestarT may be added back later.
 export const CREDITS = "Hosted by the Ministry of SMEs and Startups (MSS) and KISED";
 
-export const EVENT_NAME = "2026 Climate Tech Startup Challenge Singapore";
-export const EVENT_NAME_SHORT = "Climate Tech Startup Challenge";
-export const EVENT_NAME_LINE1 = "2026 Climate Tech Startup Challenge";
-export const EVENT_NAME_LINE2 = "Climate Tech IR / Demo Day";
+export const EVENT_NAME = "2026 Climate-tech Startup Challenge – Global Demo Day";
+export const EVENT_NAME_SHORT = "Climate-tech Startup Challenge";
+export const EVENT_NAME_LINE1 = "2026 Climate-tech Startup Challenge";
+export const EVENT_NAME_LINE2 = "Global Demo Day";
 
 export const EVENT_DATE = "Wednesday, 28 October 2026";
 export const EVENT_DAY_SHORT = "Wed 28 Oct";

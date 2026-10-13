@@ -67,7 +67,7 @@ const DAYS: ScheduleDay[] = [
     ],
   },
   {
-    date: "10/28", dow: "Wed", theme: "Climate Tech IR / Demo Day",
+    date: "10/28", dow: "Wed", theme: "Global Demo Day",
     joint: true,
     transport: "45-seat bus all day",
     items: [

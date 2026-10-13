@@ -13,7 +13,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
   head: () => ({
     meta: [
-      { title: "Admin — Climate Tech Startup Challenge Singapore" },
+      { title: "Admin — Climate-tech Startup Challenge – Global Demo Day" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -667,7 +667,7 @@ function downloadOutreachCsv(rsvps: AdminRsvp[]) {
   const header = "email,org,person,title,country,type,notes,sendable";
   const lines = rsvps.map((r) => {
     const notes = [
-      "KISED Climate Tech Startup Challenge Singapore 2026-10-28",
+      "KISED Climate-tech Startup Challenge Global Demo Day 2026-10-28",
       r.primary_interest || null,
       r.contact_url || null,
       r.checked_in_at ? "attended" : "no-show",

@@ -84,10 +84,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#12162B" },
       // Invite-only event site: keep it out of search engines (6 Oct)
       { name: "robots", content: "noindex, nofollow" },
-      { title: "2026 Climate Tech Startup Challenge · Singapore" },
+      { title: "2026 Climate-tech Startup Challenge – Global Demo Day" },
       { name: "description", content: "Ten Korean climate tech startups selected by KISED meet investors, corporates and agencies in Singapore: Demo Day on 28 October and 1:1 meetings on 29 October 2026." },
       { name: "author", content: "LodestarT" },
-      { property: "og:title", content: "2026 Climate Tech Startup Challenge · Singapore" },
+      { property: "og:title", content: "2026 Climate-tech Startup Challenge – Global Demo Day" },
       { property: "og:description", content: "Ten Korean climate tech startups meet investors, corporates and agencies in Singapore, 28–29 October 2026." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

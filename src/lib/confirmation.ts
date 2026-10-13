@@ -28,7 +28,7 @@ const COPY: Record<MailKind, { subject: string; headline: string; intro: string 
     intro: `Thank you for registering for the <b>${EVENT_TITLE}</b>. Here is your schedule:`,
   },
   week: {
-    subject: "Your schedule for the Climate Tech Startup Challenge Singapore (28–29 Oct)",
+    subject: "Your schedule for the 2026 Climate-tech Startup Challenge – Global Demo Day (28–29 Oct)",
     headline: "One week to go",
     intro: `The <b>${EVENT_TITLE}</b> is just one week away, and we're looking forward to seeing you. Here is your schedule:`,
   },
@@ -54,11 +54,11 @@ const COPY: Record<MailKind, { subject: string; headline: string; intro: string 
 // confirmation keeps its original single-card layout.
 const PERSONAL: Partial<Record<MailKind, string[]>> = {
   week: [
-    "A quick note ahead of the Climate Tech Startup Challenge Demo Day in Singapore next week. I've put your schedule below so it's easy to find.",
+    "A quick note ahead of the Climate-tech Startup Challenge Global Demo Day in Singapore next week. I've put your schedule below so it's easy to find.",
     "Looking forward to seeing you!",
   ],
   "3day": [
-    "Just a friendly reminder that the Climate Tech Startup Challenge Demo Day is this week. Your schedule is below. If anything has changed on your side, simply reply to this email.",
+    "Just a friendly reminder that the Climate-tech Startup Challenge Global Demo Day is this week. Your schedule is below. If anything has changed on your side, simply reply to this email.",
     "See you soon!",
   ],
   "meetup-eve": [
@@ -110,13 +110,13 @@ export function buildConfirmation(input: ConfirmationInput): ConfirmationEmail {
   if (input.attendLunch) demoDay.push(`Networking dinner ${programTime("lunch")}`);
 
   const meetupsCal = gcal(
-    "Climate Tech Startup Challenge · 1:1 Business Meetings",
+    "Climate-tech Startup Challenge · 1:1 Business Meetings",
     "20261029T103000/20261029T120000",
     `${MEETUP_VENUE}, ${MEETUP_ADDRESS}`,
     ["Your 1:1 meetings:", ...meetings.map((m) => `• ${m.round} ${m.time} — ${m.company}`), "", `Manage: ${SITE}/book#manage`].join("\n"),
   );
   const demoCal = gcal(
-    "Climate Tech Startup Challenge · Singapore Demo Day",
+    "Climate-tech Startup Challenge · Global Demo Day",
     "20261028T143000/20261028T200000",
     `${EVENT_VENUE}, ${EVENT_ADDRESS}`,
     [...demoDay.map((d) => `• ${d}`), "", SITE].join("\n"),
@@ -149,7 +149,7 @@ export function buildConfirmation(input: ConfirmationInput): ConfirmationEmail {
   t.push(`View or cancel your 1:1 meetings: ${SITE}/book#manage`);
   t.push(`Startup one-pagers: ${SITE}/#startups`, "");
   t.push("Need to change something? Re-submit the RSVP form with the same email, or simply reply to this email.", "");
-  if (!personal) t.push("Warm regards,", "LodestarT team, for the 2026 Climate Tech Startup Challenge");
+  if (!personal) t.push("Warm regards,", "LodestarT team, for the 2026 Climate-tech Startup Challenge");
 
   // ── HTML
   const F = "font-family:Arial,Helvetica,sans-serif;";
@@ -182,9 +182,9 @@ ${personal.map((l) => `<p style="${P}">${esc(l)}</p>`).join("\n")}
 ${personalHtml}
 <table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;${personal ? "border:1px solid #d9deec;" : ""}">
   <tr><td style="background:#3b49c2;padding:22px 32px;">
-    <div style="${F}font-size:10px;letter-spacing:1px;font-weight:bold;color:#ffffff;text-transform:uppercase;">MSS · KISED | Climate Tech Startup Challenge</div>
+    <div style="${F}font-size:10px;letter-spacing:1px;font-weight:bold;color:#ffffff;text-transform:uppercase;">MSS · KISED | Climate-tech Startup Challenge</div>
     <div style="${F}padding-top:8px;font-size:24px;line-height:28px;font-weight:800;color:#ffffff;">${esc(copy.headline)}</div>
-    <div style="${F}padding-top:4px;font-size:13px;font-weight:bold;color:#7fd3f2;">Climate Tech IR / Demo Day · 28–29 October 2026</div>
+    <div style="${F}padding-top:4px;font-size:13px;font-weight:bold;color:#7fd3f2;">Global Demo Day · 28–29 October 2026</div>
   </td></tr>
   ${personal ? `<tr><td style="padding:20px 32px 0;"></td></tr>` : `<tr><td style="padding:24px 32px 16px;${F}font-size:15px;line-height:22px;color:#12162b;">
     Dear <strong>${esc(input.fullName)}</strong>,<br><br>
@@ -206,7 +206,7 @@ ${personalHtml}
     Need to change something? Re-submit the RSVP form with the same email, or simply reply to this email.
   </td></tr>
   ${personal ? "" : `<tr><td style="background:#f3f5fb;border-top:1px solid #d9deec;padding:18px 32px;${F}font-size:14px;line-height:20px;color:#12162b;">
-    Warm regards,<br><strong style="color:#3b49c2;">LodestarT team</strong><br><span style="font-size:12px;color:#4f566e;">for the 2026 Climate Tech Startup Challenge</span>
+    Warm regards,<br><strong style="color:#3b49c2;">LodestarT team</strong><br><span style="font-size:12px;color:#4f566e;">for the 2026 Climate-tech Startup Challenge</span>
   </td></tr>`}
 </table></td></tr></table></body></html>`;
 
