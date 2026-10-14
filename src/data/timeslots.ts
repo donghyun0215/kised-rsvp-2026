@@ -70,7 +70,7 @@ export const PROGRAM: ProgramBlock[] = [
     id: "showcase",
     title: "Talks & IR pitching",
     time: "15:00 – 18:30",
-    description: "Opening remarks, an ecosystem talk and panel, then ten startup pitches (5 min pitch, 5 min Q&A each). Registration from 14:30.",
+    description: "Opening remarks, an ecosystem talk, then ten startup pitches (5 min pitch, 5 min Q&A each). Registration from 14:30.",
   },
   {
     id: "lunch",
@@ -90,7 +90,7 @@ export const PROGRAM: ProgramBlock[] = [
 export const DEMO_AGENDA: [time: string, item: string][] = [
   ["14:30 – 15:00", "Registration"],
   ["15:00 – 15:25", "Opening and welcome remarks"],
-  ["15:25 – 16:05", "Talk and panel: climate tech in Singapore"],
+  ["15:25 – 15:50", "Talk: the climate-tech ecosystem in Singapore"],
   ["16:15 – 17:10", "IR pitching, session 1 (5 startups)"],
   ["17:20 – 18:10", "IR pitching, session 2 (5 startups)"],
   ["18:10 – 18:30", "Judges' deliberation and group photo"],

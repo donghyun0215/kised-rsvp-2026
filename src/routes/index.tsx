@@ -279,7 +279,7 @@ function Landing() {
             </p>
             <p className="mt-2 font-display text-2xl font-semibold text-primary">{EVENT_TIME}</p>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Ten startup pitches with an ecosystem talk and panel, then a networking dinner. Registration from 14:30.
+              Ten startup pitches and an ecosystem talk, then a networking dinner. Registration from 14:30.
             </p>
             <div className="mt-4">
               <Place venue={EVENT_VENUE} address={EVENT_ADDRESS} map={EVENT_MAP_URL} />
