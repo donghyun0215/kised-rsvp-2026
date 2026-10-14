@@ -1,5 +1,5 @@
 // Outreach invitation email, served by /api/invite and sent from the invite
-// Google Sheet (Tammy clicks "send"). Built from the same constants as the
+// Google Sheet. `team` = signed by the LodestarT team (support@), otherwise by Tammy. Built from the same constants as the
 // site, so a confirmed venue or time is picked up without touching the sheet.
 // {{GREETING}} is replaced per recipient by the sheet script.
 import { companies } from "@/data/companies";
@@ -34,7 +34,8 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 const F = "font-family:Arial,Helvetica,sans-serif;";
 const P = `margin:0 0 14px;${F}font-size:14px;line-height:21px;color:#222222;`;
 
-export function buildInvite(): { subject: string; html: string; text: string } {
+export function buildInvite(team = false): { subject: string; html: string; text: string } {
+  const [I, my, sign] = team ? ["We are", "we would", "The LodestarT team"] : ["I am", "I would", "Tammy"];
   const showcase = PROGRAM.find((p) => p.id === "showcase");
   const dinner = PROGRAM.find((p) => p.id === "lunch");
   const demoRows: [string, string][] = [
@@ -78,11 +79,11 @@ export function buildInvite(): { subject: string; html: string; text: string } {
 
   const intro = [
     "I hope this email finds you well.",
-    `I am delighted to invite you to the <b>${esc(EVENT_NAME)}</b> in Singapore. ${esc(PITCH)}`,
+    `${I} delighted to invite you to the <b>${esc(EVENT_NAME)}</b> in Singapore. ${esc(PITCH)}`,
     ONE_ON_ONE_OPEN
       ? `They will pitch at the Demo Day on <b>${esc(EVENT_DATE)}</b>, and you are welcome to book private 1:1 meetings with the ones that interest you ${(EVENT_DATE as string) === MEETUP_DATE ? "that afternoon" : `on <b>${esc(MEETUP_DATE)}</b>`}.`
       : `They will pitch at the Demo Day on <b>${esc(EVENT_DATE)}</b>.`,
-    "It would mean a great deal to have you with us. Please find the details below, and I would be grateful if you could RSVP at your earliest convenience.",
+    `It would mean a great deal to have you with us. Please find the details below, and ${my} be grateful if you could RSVP at your earliest convenience.`,
   ];
 
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -90,7 +91,7 @@ export function buildInvite(): { subject: string; html: string; text: string } {
 <div style="max-width:600px;margin:0 auto;padding:4px 4px 18px;text-align:left;">
 <p style="${P}">{{GREETING}}</p>
 ${intro.map((l) => `<p style="${P}">${l}</p>`).join("\n")}
-<p style="${P}">Warm regards,<br>Tammy</p>
+<p style="${P}">Warm regards,<br>${sign}</p>
 </div>
 <table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;border:1px solid ${C.line};">
 <tr><td style="background:${C.brand};padding:14px 36px 20px;">
@@ -105,7 +106,7 @@ ${ORDER.map((k) => blocks[k]).join("")}
  <div style="${F}padding-top:12px;font-size:14px;"><a href="${SITE}/#startups" style="color:${C.brand};font-weight:bold;">View the startup profiles →</a></div>
 </td></tr>
 </table>
-<p style="max-width:600px;margin:14px auto 0;${F}font-size:12px;color:#8a8f9e;">If you would rather not receive invitations like this, just let me know.</p>
+<p style="max-width:600px;margin:14px auto 0;${F}font-size:12px;color:#8a8f9e;">If you would rather not receive invitations like this, just let ${team ? "us" : "me"} know.</p>
 </body></html>`;
 
   const plain = (s: string) => s.replace(/<[^>]+>/g, "");
@@ -118,14 +119,14 @@ ${ORDER.map((k) => blocks[k]).join("")}
     "",
     ...intro.map(plain).flatMap((l) => [l, ""]),
     "Warm regards,",
-    "Tammy",
+    sign,
     "",
     "----",
     ...ORDER.flatMap((k) => [...(k === "demo" ? demoText : meetText), ""]),
     `Featuring: ${names.join(", ")}`,
     `Startup profiles: ${SITE}/#startups`,
     "",
-    "If you would rather not receive invitations like this, just let me know.",
+    `If you would rather not receive invitations like this, just let ${team ? "us" : "me"} know.`,
   ].join("\n");
 
   return { subject: SUBJECT, html, text };
