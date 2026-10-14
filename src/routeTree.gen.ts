@@ -15,6 +15,7 @@ import { Route as BookRouteImport } from './routes/book'
 import { Route as LoungeRouteImport } from './routes/lounge'
 import { Route as MeetRouteImport } from './routes/meet'
 import { Route as ScheduleRouteImport } from './routes/schedule'
+import { Route as ApiInviteRouteImport } from './routes/api/invite'
 import { Route as ApiKeepaliveRouteImport } from './routes/api/keepalive'
 import { Route as ApiRemindersRouteImport } from './routes/api/reminders'
 import { Route as CompaniesSlugRouteImport } from './routes/companies/$slug'
@@ -49,6 +50,11 @@ const ScheduleRoute = ScheduleRouteImport.update({
   path: '/schedule',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiInviteRoute = ApiInviteRouteImport.update({
+  id: '/api/invite',
+  path: '/api/invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiKeepaliveRoute = ApiKeepaliveRouteImport.update({
   id: '/api/keepalive',
   path: '/api/keepalive',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/lounge': typeof LoungeRoute
   '/meet': typeof MeetRoute
   '/schedule': typeof ScheduleRoute
+  '/api/invite': typeof ApiInviteRoute
   '/api/keepalive': typeof ApiKeepaliveRoute
   '/api/reminders': typeof ApiRemindersRoute
   '/companies/$slug': typeof CompaniesSlugRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/lounge': typeof LoungeRoute
   '/meet': typeof MeetRoute
   '/schedule': typeof ScheduleRoute
+  '/api/invite': typeof ApiInviteRoute
   '/api/keepalive': typeof ApiKeepaliveRoute
   '/api/reminders': typeof ApiRemindersRoute
   '/companies/$slug': typeof CompaniesSlugRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/lounge': typeof LoungeRoute
   '/meet': typeof MeetRoute
   '/schedule': typeof ScheduleRoute
+  '/api/invite': typeof ApiInviteRoute
   '/api/keepalive': typeof ApiKeepaliveRoute
   '/api/reminders': typeof ApiRemindersRoute
   '/companies/$slug': typeof CompaniesSlugRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/lounge'
     | '/meet'
     | '/schedule'
+    | '/api/invite'
     | '/api/keepalive'
     | '/api/reminders'
     | '/companies/$slug'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/lounge'
     | '/meet'
     | '/schedule'
+    | '/api/invite'
     | '/api/keepalive'
     | '/api/reminders'
     | '/companies/$slug'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/lounge'
     | '/meet'
     | '/schedule'
+    | '/api/invite'
     | '/api/keepalive'
     | '/api/reminders'
     | '/companies/$slug'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   LoungeRoute: typeof LoungeRoute
   MeetRoute: typeof MeetRoute
   ScheduleRoute: typeof ScheduleRoute
+  ApiInviteRoute: typeof ApiInviteRoute
   ApiKeepaliveRoute: typeof ApiKeepaliveRoute
   ApiRemindersRoute: typeof ApiRemindersRoute
   CompaniesSlugRoute: typeof CompaniesSlugRoute
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ScheduleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/invite': {
+      id: '/api/invite'
+      path: '/api/invite'
+      fullPath: '/api/invite'
+      preLoaderRoute: typeof ApiInviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/keepalive': {
       id: '/api/keepalive'
       path: '/api/keepalive'
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoungeRoute: LoungeRoute,
   MeetRoute: MeetRoute,
   ScheduleRoute: ScheduleRoute,
+  ApiInviteRoute: ApiInviteRoute,
   ApiKeepaliveRoute: ApiKeepaliveRoute,
   ApiRemindersRoute: ApiRemindersRoute,
   CompaniesSlugRoute: CompaniesSlugRoute,
