@@ -24,9 +24,8 @@ export const EVENT_NAME_LINE2 = "Global Demo Day";
 export const EVENT_DATE = "Wednesday, 28 October 2026";
 export const EVENT_DAY_SHORT = "Wed 28 Oct";
 export const EVENT_TIME = "14:30 – 20:00";
-// Temasek Shophouse is plan A (application filed via CIIP); plan B is The
-// Foundry / Marina One. Drop "(to be confirmed)" once approval lands.
-export const EVENT_VENUE = "Temasek Shophouse (to be confirmed)";
+// Confirmed by Tammy, 14 Oct.
+export const EVENT_VENUE = "Temasek Shophouse";
 export const EVENT_ADDRESS = "28 Orchard Road, Singapore 238832";
 export const EVENT_MAP_URL =
   "https://www.google.com/maps/search/?api=1&query=Temasek+Shophouse+28+Orchard+Road+Singapore+238832";
@@ -44,10 +43,11 @@ export const TIMESLOTS: Timeslot[] = [
 export const MEETUP_TIME = "10:30 – 12:00";
 export const MEETUP_DATE = "Thursday, 29 October 2026";
 export const MEETUP_DAY_SHORT = "Thu 29 Oct";
-// Plan A is a NULDAM café buy-out (1:1s + one-pager display); not booked yet.
-export const MEETUP_VENUE = "Venue to be announced";
-export const MEETUP_ADDRESS = "Singapore";
-export const MEETUP_MAP_URL = "";
+// NULDAM Space, confirmed by Tammy, 14 Oct.
+export const MEETUP_VENUE = "NULDAM Space";
+export const MEETUP_ADDRESS = "2 Orchard Link, #02-14/15, *SCAPE, Singapore 237978";
+export const MEETUP_MAP_URL =
+  "https://www.google.com/maps/search/?api=1&query=*SCAPE+2+Orchard+Link+Singapore+237978";
 
 // Kept for API compatibility with the booking engine; every company offers
 // every round.
@@ -86,7 +86,7 @@ export const PROGRAM: ProgramBlock[] = [
   },
 ];
 
-// Demo Day run of show (timetable 0921, TBC). Shown on the RSVP page.
+// Demo Day run of show (timetable 0921). Shown on the RSVP page.
 export const DEMO_AGENDA: [time: string, item: string][] = [
   ["14:30 – 15:00", "Registration"],
   ["15:00 – 15:25", "Opening and welcome remarks"],
