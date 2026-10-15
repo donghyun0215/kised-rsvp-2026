@@ -3,7 +3,7 @@ import { Wordmark } from "@/components/Wordmark";
 import sphereArt from "@/assets/ci/sphere.webp";
 import { getCompanyBySlug, TRACKS } from "@/data/companies";
 import { EVENT_DATE, EVENT_VENUE, ONE_ON_ONE_OPEN, MEETUP_DATE, EVENT_NAME } from "@/data/timeslots";
-import { STARTUP_LOGOS } from "@/data/companyImages";
+import { STARTUP_LOGOS, TEAM_PHOTOS } from "@/data/companyImages";
 
 export const Route = createFileRoute("/companies/$slug")({
   component: CompanyOnePager,
@@ -237,13 +237,17 @@ function CompanyOnePager() {
           {company.team.map((member) => (
             <div key={member.name} className="card-startup rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-display text-sm font-bold text-primary">
-                  {member.name
-                    .split(" ")
-                    .slice(0, 2)
-                    .map((w) => w[0])
-                    .join("")}
-                </div>
+                {TEAM_PHOTOS[member.name] ? (
+                  <img src={TEAM_PHOTOS[member.name]} alt={member.name} loading="lazy" className="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-primary/15" />
+                ) : (
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-display text-sm font-bold text-primary">
+                    {member.name
+                      .split(" ")
+                      .slice(0, 2)
+                      .map((w) => w[0])
+                      .join("")}
+                  </div>
+                )}
                 <div className="min-w-0">
                   <div className="truncate text-sm font-bold text-navy">{member.name}</div>
                   <div className="text-[10px] font-semibold uppercase tracking-wide text-primary">{member.role}</div>
