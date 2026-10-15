@@ -65,7 +65,7 @@ function ContactOrganizer() {
         type="button"
         onClick={handleCopy}
         title={ORGANIZER_EMAIL}
-        className="rounded-full border border-white/30 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/10 sm:px-4 sm:py-2 sm:text-sm"
+        className="rounded-full border border-white/30 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-white/10 sm:px-4 sm:py-2 sm:text-sm"
       >
         {copied ? "Email copied" : "Contact"}
       </button>
@@ -188,11 +188,11 @@ function Landing() {
           <a href="#top" className="min-w-0">
             <Wordmark light />
           </a>
-          <nav className="-mx-2 flex items-center gap-1 text-sm font-semibold md:mx-0 md:gap-2">
-            <a href="#startups" className="rounded-full px-2 py-1.5 text-white/85 hover:text-white md:px-3 md:py-2">Startups</a>
-            <a href="#judges" className="rounded-full px-2 py-1.5 text-white/85 hover:text-white md:px-3 md:py-2">Judges</a>
-            <a href="#about" className="rounded-full px-2 py-1.5 text-white/85 hover:text-white md:px-3 md:py-2">About</a>
-            <a href="/lounge" className="rounded-full px-2 py-1.5 text-white/85 hover:text-white md:px-3 md:py-2">Lounge</a>
+          <nav className="-mx-1.5 flex items-center gap-0 text-[12.5px] min-[380px]:text-[13px] font-semibold sm:text-sm md:mx-0 md:gap-2">
+            <a href="#rsvp" className="rounded-full px-1 py-1.5 min-[380px]:px-1.5 sm:px-2 text-white/85 hover:text-white md:px-3 md:py-2">RSVP</a>
+            <a href="#startups" className="rounded-full px-1 py-1.5 min-[380px]:px-1.5 sm:px-2 text-white/85 hover:text-white md:px-3 md:py-2">Startups</a>
+            <a href="#about" className="rounded-full px-1 py-1.5 min-[380px]:px-1.5 sm:px-2 text-white/85 hover:text-white md:px-3 md:py-2">About</a>
+            <a href="/lounge" className="whitespace-nowrap rounded-full px-1 py-1.5 min-[380px]:px-1.5 sm:px-2 text-white/85 hover:text-white md:px-3 md:py-2">Networking Lounge</a>
             <span className="ml-auto md:ml-1"><ContactOrganizer /></span>
           </nav>
         </header>
