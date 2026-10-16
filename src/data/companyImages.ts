@@ -20,6 +20,7 @@ import logoGigaette from "@/assets/startups/logos/gigaette.png";
 import logoTheorigin from "@/assets/startups/logos/theorigin.png";
 import logoTerracle from "@/assets/startups/logos/terracle.png";
 import logoSolarlease from "@/assets/startups/logos/solarlease.png";
+import logoDeepRenewables from "@/assets/startups/logos/deeprenewables.png";
 
 export const STARTUP_IMAGES: Record<string, string> = {
   refeed: imgRefeed,
@@ -72,4 +73,10 @@ export const TEAM_PHOTOS: Record<string, string> = {
   "Kibaek Gweon": photoTerracle,
   "Minchan Kim": photoReblock,
   "Chungho Lee": photoRefeed,
+};
+
+// Company CI shown beside the brand logo on the profile, where the brand and
+// the company differ (MYSC, 16 Oct: Solarlease is Deep Renewables' brand).
+export const COMPANY_CI: Record<string, string> = {
+  solarlease: logoDeepRenewables,
 };

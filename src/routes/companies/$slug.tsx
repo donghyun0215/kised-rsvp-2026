@@ -3,7 +3,7 @@ import { Wordmark } from "@/components/Wordmark";
 import sphereArt from "@/assets/ci/sphere.webp";
 import { getCompanyBySlug, TRACKS } from "@/data/companies";
 import { EVENT_DATE, EVENT_VENUE, ONE_ON_ONE_OPEN, MEETUP_DATE, EVENT_NAME } from "@/data/timeslots";
-import { STARTUP_LOGOS, TEAM_PHOTOS } from "@/data/companyImages";
+import { COMPANY_CI, STARTUP_LOGOS, TEAM_PHOTOS } from "@/data/companyImages";
 
 export const Route = createFileRoute("/companies/$slug")({
   component: CompanyOnePager,
@@ -110,6 +110,12 @@ function CompanyOnePager() {
             {logo && (
               <div className="inline-flex items-center rounded-lg bg-white px-4 py-2.5 shadow-elegant">
                 <img src={logo} alt={`${company.name} logo`} className="h-7 w-auto object-contain sm:h-8" />
+                {COMPANY_CI[company.slug] && (
+                  <>
+                    <span className="mx-3 h-7 w-px bg-border" aria-hidden />
+                    <img src={COMPANY_CI[company.slug]} alt="Company logo" className="h-8 w-auto object-contain sm:h-9" />
+                  </>
+                )}
               </div>
             )}
             <h1 className="bg-gradient-to-r from-white to-light-blue bg-clip-text text-3xl font-bold leading-[1.05] text-transparent sm:text-4xl">
