@@ -305,7 +305,7 @@ export const companies: Company[] = [
     team: [
       { name: "Minchan Kim", role: "Founder & CEO", bio: ["3 years leading tech-based ESG commercialization projects", "Environmental research projects with the Korean Society for Microbiology & Korea Forest Service", "Member, Korea Block Association"] },
       { name: "Seonghyun Park", role: "CTO", bio: ["Eco-friendly landscaping projects", "Member, Korea Block Association"] },
-      { name: "Dayeon Jung", role: "CRO", bio: ["B2B trade sales between Korea and Spain", "UC Berkeley Haas, I-Corps program"] },
+      { name: "Dayeon Jung", role: "COO", bio: ["B2B trade sales between Korea and Spain", "UC Berkeley Haas, I-Corps program"] },
       { name: "Jinsu Yun", role: "CBO", bio: ["2 years as CEO of a social enterprise", "Business Administration, Konkuk University"] },
       { name: "Advisors", role: "", bio: ["Eco-friendly Concrete Lab, Konkuk University", "Korean Society for Life Cycle Assessment"] },
     ],
