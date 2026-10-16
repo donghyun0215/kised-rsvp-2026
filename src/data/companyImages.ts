@@ -58,6 +58,7 @@ import photoSolarlease from "@/assets/team/solarlease.jpg";
 import photoMce from "@/assets/team/mce.jpg";
 import photoTerracle from "@/assets/team/terracle.jpg";
 import photoReblock from "@/assets/team/reblock.jpg";
+import photoRefeed from "@/assets/team/refeed.jpg";
 
 export const TEAM_PHOTOS: Record<string, string> = {
   "Sungmin Kim": photoApexion,
@@ -70,4 +71,5 @@ export const TEAM_PHOTOS: Record<string, string> = {
   "John (Jonguk) Park": photoMce,
   "Kibaek Gweon": photoTerracle,
   "Minchan Kim": photoReblock,
+  "Chungho Lee": photoRefeed,
 };
