@@ -1,9 +1,12 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Wordmark } from "@/components/Wordmark";
 import sphereArt from "@/assets/ci/sphere.webp";
-import { getCompanyBySlug, TRACKS } from "@/data/companies";
-import { EVENT_DATE, EVENT_VENUE, ONE_ON_ONE_OPEN, MEETUP_DATE, EVENT_NAME } from "@/data/timeslots";
-import { COMPANY_CI, STARTUP_LOGOS, TEAM_PHOTOS } from "@/data/companyImages";
+import { useState, type CSSProperties } from "react";
+import { companies, getCompanyBySlug, type Company } from "@/data/companies";
+import { HIGHLIGHTS } from "@/data/profileHighlights";
+import { useShow } from "@/lib/useShow";
+import { EVENT_DATE, EVENT_VENUE, ONE_ON_ONE_OPEN, MEETUP_DATE, EVENT_NAME, CREDITS } from "@/data/timeslots";
+import { COMPANY_CI, STARTUP_IMAGES, STARTUP_LOGOS, TEAM_PHOTOS } from "@/data/companyImages";
 
 export const Route = createFileRoute("/companies/$slug")({
   component: CompanyOnePager,
@@ -32,275 +35,345 @@ export const Route = createFileRoute("/companies/$slug")({
   ),
 });
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">{children}</div>
-  );
+// A climate-tech profile reads as one transformation: what goes in, what
+// comes out, the numbers that prove it, and who to meet. Order: hero with
+// the from → into statement through the CI sphere; the story (problem →
+// fix) beside a sticky "climate facts" label; the detail in an accordion;
+// proof; the person you'll meet and what they're looking for; next startup.
+
+// "Label: text" lines get their label set in bold.
+function lead(s: string): [string | null, string] {
+  const m = s.match(/^([^:]{2,42}):\s+(.+)$/);
+  return m ? [m[1], m[2]] : [null, s];
 }
 
-function Bullets({ items, compact = false }: { items: string[]; compact?: boolean }) {
+function Points({ items, tone = "ink" }: { items: string[]; tone?: "ink" | "light" }) {
   return (
-    <ul className={compact ? "mt-2.5 space-y-1.5" : "mt-3 space-y-2"}>
-      {items.map((item, i) => (
-        <li key={i} className="flex gap-2.5 text-[13px] leading-relaxed text-foreground/85">
-          <span className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-primary" />
-          <span>{item}</span>
-        </li>
-      ))}
+    <ul className="space-y-3">
+      {items.map((item, i) => {
+        const [l, t] = lead(item);
+        return (
+          <li key={i} className={`flex gap-3 text-[15px] leading-relaxed ${tone === "light" ? "text-white/80" : "text-navy/80"}`}>
+            <span aria-hidden className={`mt-[0.55rem] h-2 w-2 shrink-0 rounded-full ${tone === "light" ? "bg-yellow" : "bg-primary"}`} />
+            <span>{l && <b className={tone === "light" ? "font-semibold text-white" : "font-semibold text-navy"}>{l}: </b>}{t}</span>
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
-function InfoCard({ title, items }: { title: string; items: string[] }) {
+// The eco-label: numbers on a printed label, like a carbon or energy label.
+function FactsLabel({ company, bookSearch, bookLabel }: { company: Company; bookSearch: Record<string, string>; bookLabel: string }) {
+  const hl = HIGHLIGHTS[company.slug];
+  if (!hl) return null;
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <Eyebrow>{title}</Eyebrow>
-      <Bullets items={items} compact />
+    <aside data-show className="facts-label" aria-label={`${company.name} in numbers`}>
+      <div className="flex items-end justify-between gap-3">
+        <h2 className="font-display text-[1.75rem] font-extrabold leading-none text-navy">Climate facts</h2>
+        <img src={sphereArt} alt="" className="facts-orb h-9 w-9" />
+      </div>
+      <p className="mt-1.5 text-xs text-navy/60">{company.name} · {company.stage}</p>
+      <div className="mt-3 h-2 bg-navy" />
+      <dl>
+        {hl.facts.map(([v, l], i) => (
+          <div key={l} className="facts-row" style={{ "--i": i } as CSSProperties}>
+            <dd className="font-display text-[1.6rem] font-extrabold leading-none tracking-tight text-navy">{v}</dd>
+            <dt className="text-[13px] leading-snug text-navy/75">{l}</dt>
+          </div>
+        ))}
+      </dl>
+      <div className="h-1 bg-navy" />
+      <p className="mt-2 text-[11px] leading-snug text-navy/55">From the company's one-pager, October 2026.</p>
+      <Link to="/book" search={bookSearch} className="mt-5 flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary/90">
+        {bookLabel}
+      </Link>
+    </aside>
+  );
+}
+
+function Accordion({ items }: { items: { title: string; body: string[] }[] }) {
+  const [open, setOpen] = useState(0);
+  return (
+    <div className="divide-y divide-navy/10 overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-card)]">
+      {items.map((it, i) => {
+        const on = open === i;
+        return (
+          <div key={it.title}>
+            <h3>
+              <button
+                type="button"
+                aria-expanded={on}
+                aria-controls={`acc-${i}`}
+                onClick={() => setOpen(on ? -1 : i)}
+                className="acc-btn flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+              >
+                <span className="font-display text-lg font-bold text-navy md:text-xl">{it.title}</span>
+                <span className="flex items-center gap-3">
+                  <span className="text-sm text-navy/50">{it.body.length} points</span>
+                  <span aria-hidden className={`acc-icon ${on ? "is-on" : ""}`} />
+                </span>
+              </button>
+            </h3>
+            <div id={`acc-${i}`} role="region" className={`acc-panel ${on ? "is-on" : ""}`}>
+              <div className="min-h-0 overflow-hidden">
+                <div className="px-6 pb-6"><Points items={it.body} /></div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
+function initials(name: string) {
+  return name.replace(/\(.*?\)/g, "").split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]).join("");
+}
+
 function CompanyOnePager() {
   const company = Route.useLoaderData();
-  const track = TRACKS[company.track];
+  return <Profile key={company.slug} company={company} />;
+}
+
+function Profile({ company }: { company: Company }) {
+  useShow([company.slug]);
   const logo = STARTUP_LOGOS[company.slug];
-  const meetTarget = "/book" as const;
+  const photo = STARTUP_IMAGES[company.slug];
+  const ci = COMPANY_CI[company.slug];
   const onePager = company.onepager ?? null;
-  const irDeck = company.irdeck ?? null;
-  // Only cohort companies take 1:1 bookings.
   const hasMeetups = ONE_ON_ONE_OPEN && company.track === "track1";
-  const bookLabel = hasMeetups ? "Book a 1:1 Meeting" : "RSVP for Demo Day";
-  const bookSearch = hasMeetups ? { day: "5" as const, company: company.slug } : { day: "7" as const };
+  const bookLabel = hasMeetups ? "Book a 1:1 meeting" : "RSVP for the Demo Day";
+  const bookSearch: Record<string, string> = hasMeetups ? { day: "5", company: company.slug } : { day: "7" };
+  const hl = HIGHLIGHTS[company.slug];
+  const idx = companies.findIndex((c) => c.slug === company.slug);
+  const next = companies[(idx + 1) % companies.length];
+  const prev = companies[(idx - 1 + companies.length) % companies.length];
+  const host = company.team.find((m) => TEAM_PHOTOS[m.name]) ?? company.team[0];
+  const others = company.team.filter((m) => m !== host && m.name && !/^Advisors?$/.test(m.name));
+  const site = company.website?.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const details = [
+    { title: "How it works", body: company.keyFeatures },
+    { title: "Business model", body: company.businessModel },
+    { title: "Who it's for", body: company.targetAudience },
+  ].filter((d) => d.body.length);
 
   return (
     <div className="min-h-screen bg-background">
-      {/* NAV */}
-      <header className="sticky top-0 z-30 border-b border-border/50 bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
-          <Link to="/" className="flex min-w-0 items-center">
-            <Wordmark compact />
-          </Link>
-          <nav className="flex shrink-0 items-center">
-            <Link
-              to="/"
-              hash="startups"
-              className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-navy transition hover:bg-muted sm:px-4 sm:py-2 sm:text-sm"
-            >
-              All startups
-            </Link>
+      <div aria-hidden className="fixed inset-x-0 top-0 z-50 h-[3px]">
+        <div id="read-progress" className="h-full origin-left scale-x-0 bg-gradient-to-r from-primary to-yellow" />
+      </div>
+
+      {/* HERO */}
+      <section className="relative isolate overflow-hidden bg-hero-gradient text-white">
+        <img src={sphereArt} alt="" aria-hidden className="hero-sphere pointer-events-none absolute -right-28 -top-24 -z-10 w-[420px] opacity-60" />
+        <header className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
+          <Link to="/" className="flex min-w-0 items-center"><Wordmark light compact /></Link>
+          <nav className="flex shrink-0 items-center gap-1 text-sm font-semibold">
+            <Link to="/companies/$slug" params={{ slug: prev.slug }} className="pager-btn" aria-label={`Previous startup: ${prev.name}`}>‹</Link>
+            <span className="px-1 tabular-nums text-white/50">{idx + 1}/{companies.length}</span>
+            <Link to="/companies/$slug" params={{ slug: next.slug }} className="pager-btn" aria-label={`Next startup: ${next.name}`}>›</Link>
+            <Link to="/" hash="startups" className="ml-2 rounded-full border border-white/25 px-3.5 py-1.5 text-white/90 transition hover:bg-white/10">All startups</Link>
           </nav>
-        </div>
-      </header>
+        </header>
 
-      {/* COMPACT HERO */}
-      <section className="relative isolate overflow-hidden bg-hero-gradient text-primary-foreground">
-        <img src={sphereArt} alt="" aria-hidden className="orb pointer-events-none absolute -right-16 -top-16 -z-10 w-[200px] opacity-80 sm:-right-10 sm:w-[300px]" />
-        <div
-          className="absolute inset-0 -z-10 opacity-25"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 15% 20%, oklch(0.68 0.18 245 / 0.5), transparent 45%), radial-gradient(circle at 85% 80%, oklch(0.35 0.18 265 / 0.6), transparent 45%)",
-          }}
-        />
-        <div className="mx-auto max-w-6xl px-5 pb-14 pt-7 sm:px-6 md:pb-16 md:pt-8">
-          <div className="text-[11px] font-medium text-primary-foreground/75">
-            {track.title} · {track.dates}
-          </div>
-          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3">
-            {logo && (
-              <div className="inline-flex items-center rounded-lg bg-white px-4 py-2.5 shadow-elegant">
-                <img src={logo} alt={`${company.name} logo`} className="h-7 w-auto object-contain sm:h-8" />
-                {COMPANY_CI[company.slug] && (
-                  <>
-                    <span className="mx-3 h-7 w-px bg-border" aria-hidden />
-                    <img src={COMPANY_CI[company.slug]} alt="Company logo" className="h-8 w-auto object-contain sm:h-9" />
-                  </>
-                )}
-              </div>
-            )}
-            <h1 className="bg-gradient-to-r from-white to-light-blue bg-clip-text text-3xl font-bold leading-[1.05] text-transparent sm:text-4xl">
-              {company.displayName}
-            </h1>
-            <span className="hidden items-center gap-2 text-xs font-medium md:flex">
-              <span className="rounded-full bg-primary-foreground/15 px-3 py-1">{company.sector}</span>
-              <span className="rounded-full bg-primary-foreground/15 px-3 py-1">{company.stage}</span>
-            </span>
-          </div>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-primary-foreground/90 sm:text-base">
-            {company.tagline}
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2.5">
-            <Link
-              to={meetTarget}
-              search={bookSearch}
-              className="btn-hero inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
-            >
-              {bookLabel}
-              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-            </Link>
-            {onePager && (
-              <a
-                href={onePager}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-outline-hero inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
-              >
-                ⬇ One-Pager (PDF)
-              </a>
-            )}
-            {irDeck && (
-              <a
-                href={irDeck}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-outline-hero inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
-              >
-                ⬇ IR Deck (PDF)
-              </a>
-            )}
-            {!onePager && !irDeck && (
-              <span className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 px-5 py-2.5 text-sm font-semibold text-primary-foreground/70">
-                One-pager coming soon
-              </span>
-            )}
-            {company.website && (
-              <a
-                href={company.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-outline-hero inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold"
-              >
-                Website ↗
-              </a>
-            )}
-          </div>
-        </div>
-        <svg
-          className="absolute bottom-0 left-0 right-0 h-8 w-full text-background"
-          viewBox="0 0 1440 40"
-          preserveAspectRatio="none"
-          fill="currentColor"
-        >
-          <path d="M0 20 Q 360 40 720 20 T 1440 20 L1440 40 L0 40 Z" />
-        </svg>
-      </section>
-
-      {/* DENSE CONTENT GRID */}
-      <section className="mx-auto max-w-6xl px-5 py-8 sm:px-6 md:py-10">
-        <div className="grid gap-4 md:grid-cols-3">
-          <InfoCard title="Problem" items={company.problem} />
-          <InfoCard title="Solution" items={company.solution} />
-          <InfoCard title="Key Features" items={company.keyFeatures} />
-          <InfoCard title="Target Audience" items={company.targetAudience} />
-          <InfoCard title="Business Model" items={company.businessModel} />
-          <InfoCard title="Seeking in Singapore" items={company.seekingOpportunities} />
-        </div>
-      </section>
-
-      {/* SNAPSHOT — compact dark band */}
-      <section className="bg-hero-gradient text-primary-foreground">
-        <div className="mx-auto max-w-6xl px-5 py-8 sm:px-6 md:py-10">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground/80">
-            Business Snapshot — Traction & Milestones
-          </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {company.businessSnapshot.map((item, i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-primary-foreground/20 bg-primary-foreground/10 p-3.5 text-[13px] leading-relaxed backdrop-blur-sm"
-              >
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* TEAM + CONTACT */}
-      <section className="mx-auto max-w-6xl px-5 py-8 sm:px-6 md:py-10">
-        <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-10 pt-6 sm:px-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:gap-14 lg:pt-10">
           <div>
-            <Eyebrow>Team</Eyebrow>
-            <h2 className="mt-1 text-xl font-bold text-navy">Who You'll Meet</h2>
+            <div className="hero-in flex flex-wrap items-center gap-3">
+              {logo && (
+                <span className="inline-flex h-14 items-center rounded-xl bg-white px-4 shadow-[var(--shadow-elegant)]">
+                  <img src={logo} alt={`${company.name} logo`} className="h-8 w-auto max-w-[11rem] object-contain" />
+                  {ci && (<><span aria-hidden className="mx-3 h-7 w-px bg-navy/15" /><img src={ci} alt="Company logo" className="h-7 w-auto object-contain" /></>)}
+                </span>
+              )}
+              <span className="text-sm text-white/60">{company.sector}</span>
+            </div>
+            <h1 className="hero-in mt-6 font-display text-[clamp(2.5rem,6vw,4.4rem)] font-bold leading-[1.02] tracking-tight [--i:1]">{company.displayName}</h1>
+            <p className="hero-in mt-5 max-w-2xl text-[1.0625rem] leading-relaxed text-white/75 [--i:2]">{company.tagline}</p>
+            <div className="hero-in mt-8 flex flex-wrap gap-3 [--i:3]">
+              <Link to="/book" search={bookSearch} className="btn-hero inline-flex items-center rounded-full px-6 py-3 text-sm font-semibold">{bookLabel}</Link>
+              {onePager && <a href={onePager} target="_blank" rel="noopener noreferrer" className="btn-outline-hero inline-flex items-center rounded-full px-5 py-3 text-sm font-semibold">One-pager (PDF)</a>}
+              {company.website && <a href={company.website} target="_blank" rel="noopener noreferrer" className="btn-outline-hero inline-flex items-center rounded-full px-5 py-3 text-sm font-semibold">Website</a>}
+            </div>
           </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-1 text-[13px] text-foreground/85">
-            {company.website && (
-              <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                {company.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-              </a>
-            )}
-            {company.email && (
-              <a href={`mailto:${company.email}`} className="hover:underline">
-                {company.email}
-              </a>
-            )}
-            {company.phone && <span>{company.phone}</span>}
+          {photo && (
+            <figure className="hero-in relative [--i:2]">
+              <div className="photo-glow overflow-hidden rounded-[1.75rem] ring-1 ring-white/15">
+                <img src={photo} alt={`${company.name} product`} className="aspect-[4/3] w-full object-cover" />
+              </div>
+            </figure>
+          )}
+        </div>
+
+        {/* the transformation, set through the CI sphere */}
+        {hl && (
+          <div className="mx-auto max-w-6xl px-4 pb-14 sm:px-6 lg:pb-20">
+            <div className="transform-band" aria-label={`From ${hl.from} into ${hl.into}`}>
+              <div className="text-left">
+                <p className="text-sm text-white/50">From</p>
+                <p className="mt-1 font-display text-[clamp(1.4rem,3.2vw,2.3rem)] font-semibold leading-tight text-white/60">{hl.from}</p>
+              </div>
+              <div aria-hidden className="transform-core">
+                <span className="flow flow-in" />
+                <img src={sphereArt} alt="" className="core-orb" />
+                <span className="flow flow-out" />
+              </div>
+              <div className="text-left md:text-right">
+                <p className="text-sm text-yellow">Into</p>
+                <p className="mt-1 font-display text-[clamp(1.4rem,3.2vw,2.3rem)] font-bold leading-tight text-white">{hl.into}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* STORY + FACTS LABEL */}
+      <section className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:py-20 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-16">
+        <div className="order-2 lg:order-1">
+          {company.problem.length > 0 && (
+            <div data-show className="story-block">
+              <p className="text-sm font-semibold text-navy/50">The problem</p>
+              {hl && <p className="mt-2 font-display text-[1.65rem] font-semibold leading-snug text-navy/70 md:text-[2rem]">{hl.problem}</p>}
+              <div className="mt-6"><Points items={company.problem} /></div>
+            </div>
+          )}
+          <div aria-hidden className="story-turn my-10"><img src={sphereArt} alt="" className="h-10 w-10" /></div>
+          {company.solution.length > 0 && (
+            <div data-show className="story-block">
+              <p className="text-sm font-semibold text-primary">What {company.name} does</p>
+              {hl && <p className="mt-2 font-display text-[1.65rem] font-bold leading-snug text-navy md:text-[2rem]">{hl.fix}</p>}
+              <div className="mt-6"><Points items={company.solution} /></div>
+            </div>
+          )}
+        </div>
+        <div className="order-1 lg:order-2">
+          <div className="lg:sticky lg:top-8">
+            <FactsLabel company={company} bookSearch={bookSearch} bookLabel={bookLabel} />
           </div>
         </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {company.team.map((member) => (
-            <div key={member.name} className="card-startup rounded-xl p-4">
-              <div className="flex items-center gap-3">
-                {TEAM_PHOTOS[member.name] ? (
-                  <img src={TEAM_PHOTOS[member.name]} alt={member.name} loading="lazy" className="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-primary/15" />
-                ) : (
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 font-display text-sm font-bold text-primary">
-                    {member.name
-                      .split(" ")
-                      .slice(0, 2)
-                      .map((w) => w[0])
-                      .join("")}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-bold text-navy">{member.name}</div>
-                  <div className="text-[10px] font-semibold uppercase tracking-wide text-primary">{member.role}</div>
-                </div>
-              </div>
-              <ul className="mt-2.5 space-y-1">
-                {member.bio.map((line, i) => (
-                  <li key={i} className="text-[11px] leading-relaxed text-muted-foreground">
-                    {line}
+      </section>
+
+      {details.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 md:pb-24">
+          <h2 data-show className="font-display text-3xl font-bold text-navy md:text-4xl">The detail</h2>
+          <div data-show className="mt-8"><Accordion items={details} /></div>
+        </section>
+      )}
+
+      {/* PROOF */}
+      {company.businessSnapshot.length > 0 && (
+        <section className="relative isolate overflow-hidden bg-hero-gradient text-white">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24">
+            <h2 data-show className="font-display text-3xl font-bold md:text-4xl">Proof so far</h2>
+            <ol data-show className="proof-list mt-10 grid gap-x-12 md:grid-cols-2">
+              {company.businessSnapshot.map((item, i) => {
+                const [l, t] = lead(item);
+                return (
+                  <li key={i} className="flex gap-4 border-t border-white/15 py-5" style={{ "--i": i } as CSSProperties}>
+                    <span aria-hidden className="proof-dot mt-1.5" />
+                    <span className="text-[15px] leading-relaxed text-white/80">
+                      {l && <b className="block font-display text-base font-semibold text-yellow">{l}</b>}
+                      {t}
+                    </span>
                   </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* INLINE CTA + FOOTER */}
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card px-6 py-5 shadow-sm">
-          <div>
-            <div className="text-base font-bold text-navy">Meet {company.name} in Singapore</div>
-            <div className="text-xs text-muted-foreground">
-              Private 1:1 · {ONE_ON_ONE_OPEN ? MEETUP_DATE : `Showcase · ${EVENT_DATE} · ${EVENT_VENUE}`}
-            </div>
+                );
+              })}
+            </ol>
           </div>
-          <div className="flex flex-wrap gap-2.5">
-            <Link
-              to={meetTarget}
-              search={bookSearch}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90"
-            >
-              {bookLabel}
-            </Link>
-            <Link
-              to="/"
-              hash="startups"
-              className="inline-flex items-center gap-2 rounded-full border border-primary bg-background px-5 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/10"
-            >
-              ← All Startups
-            </Link>
+        </section>
+      )}
+
+      {/* MEET */}
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24">
+        <h2 data-show className="font-display text-3xl font-bold text-navy md:text-4xl">Meet {company.name} in Singapore</h2>
+        <div className="mt-10 grid gap-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
+          {host && (
+            <div data-show className="host-card">
+              <div className="host-photo">
+                {TEAM_PHOTOS[host.name] ? (
+                  <img src={TEAM_PHOTOS[host.name]} alt={host.name} className="h-full w-full rounded-full object-cover" />
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center rounded-full bg-secondary font-display text-3xl font-bold text-primary">{initials(host.name)}</span>
+                )}
+              </div>
+              <p className="mt-6 text-sm text-navy/55">You'll meet</p>
+              <p className="font-display text-2xl font-bold text-navy">{host.name}</p>
+              <p className="text-sm font-semibold text-primary">{host.role}</p>
+              {host.bio.length > 0 && (
+                <ul className="mt-4 space-y-1 text-[13px] leading-relaxed text-navy/65">
+                  {host.bio.map((b, i) => <li key={i}>{b}</li>)}
+                </ul>
+              )}
+              <Link to="/book" search={bookSearch} className="mt-6 flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary/90">
+                {hasMeetups ? `Book a 1:1 with ${host.name.split(" ")[0]}` : bookLabel}
+              </Link>
+              <p className="mt-3 text-center text-xs text-navy/50">{hasMeetups ? MEETUP_DATE : `${EVENT_DATE} · ${EVENT_VENUE}`}</p>
+            </div>
+          )}
+          <div>
+            <p data-show className="text-sm font-semibold text-navy/55">They're looking for</p>
+            <ul data-show className="ask-list mt-3">
+              {company.seekingOpportunities.map((item, i) => (
+                <li key={i} style={{ "--i": i } as CSSProperties}>
+                  <Link to="/book" search={bookSearch} className="ask-row group">
+                    <span aria-hidden className="ask-orb" />
+                    <span className="min-w-0">
+                      <span className="block font-display text-lg font-bold text-navy">{hl?.asks[i] ?? item}</span>
+                      {hl?.asks[i] && <span className="mt-1 block text-sm leading-relaxed text-navy/60">{item}</span>}
+                    </span>
+                    <span aria-hidden className="ask-go">→</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {others.length > 0 && (
+              <>
+                <p data-show className="mt-10 text-sm font-semibold text-navy/55">Also on the team</p>
+                <ul data-show className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {others.map((m) => (
+                    <li key={m.name} className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">
+                      {TEAM_PHOTOS[m.name] ? (
+                        <img src={TEAM_PHOTOS[m.name]} alt={m.name} className="h-11 w-11 shrink-0 rounded-full object-cover" />
+                      ) : (
+                        <span aria-hidden className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-bold text-primary">{initials(m.name)}</span>
+                      )}
+                      <span className="min-w-0">
+                        <span className="block font-semibold text-navy">{m.name}</span>
+                        <span className="block text-xs text-navy/55">{m.role}</span>
+                        {m.bio[0] && <span className="mt-1 block text-xs leading-relaxed text-navy/60">{m.bio[0]}</span>}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {(site || company.email || company.phone) && (
+              <p className="mt-8 flex flex-wrap gap-x-6 gap-y-1 text-sm text-navy/80">
+                {site && <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{site}</a>}
+                {company.email && <a href={`mailto:${company.email}`} className="hover:underline">{company.email}</a>}
+                {company.phone && <span>{company.phone}</span>}
+              </p>
+            )}
           </div>
         </div>
       </section>
+
+      {/* NEXT */}
+      <Link to="/companies/$slug" params={{ slug: next.slug }} className="next-band group block bg-hero-gradient text-white">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-4 px-4 py-12 sm:px-6 md:py-16">
+          <span className="text-sm text-white/55">Next startup</span>
+          <span className="font-display text-3xl font-bold md:text-4xl">{next.name}</span>
+          {HIGHLIGHTS[next.slug] && (
+            <span className="text-white/70">{HIGHLIGHTS[next.slug].from} <span aria-hidden className="text-yellow">→</span> {HIGHLIGHTS[next.slug].into}</span>
+          )}
+          <span aria-hidden className="next-orb ml-auto"><img src={sphereArt} alt="" /></span>
+        </div>
+      </Link>
 
       <footer className="border-t border-border bg-background">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-5">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-6 sm:px-6">
           <Wordmark />
-          <div className="text-xs text-muted-foreground">© {EVENT_NAME} · Hosted by MSS &amp; KISED</div>
+          <div className="text-xs text-muted-foreground">© {EVENT_NAME}. {CREDITS}.</div>
         </div>
       </footer>
     </div>
