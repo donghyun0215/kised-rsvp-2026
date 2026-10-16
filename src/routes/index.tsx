@@ -155,7 +155,7 @@ function useTiltAndMagnet() {
   }, []);
 }
 
-const HEADLINE = ["Ten", "Korean", "startups", "turning", "waste", "into", "markets"];
+const HEADLINE = ["Ten", "Korean", "startups", "driving", "climate", "innovation"];
 
 // CI artwork from the event banner: textured spheres and thin rings.
 function Orbs() {
