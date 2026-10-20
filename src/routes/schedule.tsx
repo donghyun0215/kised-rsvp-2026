@@ -72,7 +72,7 @@ const DAYS: ScheduleDay[] = [
     transport: "45-seat bus all day",
     items: [
       { time: "10:00 – 12:00", title: "On-site briefing & pitch rehearsal", venue: EVENT_VENUE },
-      { time: "12:00 – 13:30", title: "Lunch" },
+      { time: "12:00 – 14:30", title: "Lunch & final venue prep" },
       ...DEMO_AGENDA.map(([time, title]) => ({ time, title, highlight: /pitching|Registration/.test(title) })),
     ],
   },

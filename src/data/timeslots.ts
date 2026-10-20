@@ -69,13 +69,13 @@ export const PROGRAM: ProgramBlock[] = [
   {
     id: "showcase",
     title: "Talks & IR pitching",
-    time: "15:00 – 18:30",
+    time: "15:00 – 17:45",
     description: "Opening remarks, an ecosystem talk, then ten startup pitches (5 min pitch, 5 min Q&A each). Registration from 14:30.",
   },
   {
     id: "lunch",
     title: "Networking dinner",
-    time: "18:30 – 20:00",
+    time: "17:45 – 20:00",
     description: "Catered dinner with the founders, investors, corporates and partners in the room.",
   },
   {
@@ -87,14 +87,20 @@ export const PROGRAM: ProgramBlock[] = [
 ];
 
 // Demo Day run of show (timetable 0921). Shown on the RSVP page.
+// Run of show moved earlier (MYSC "IR Demoday 행사 일정" tab, 20 Oct, from
+// the 19 Oct ops meeting): shorter opening and talk, pitching from 15:30,
+// a 20-minute break between sessions, dinner from 17:45. Pitch order is
+// still draft, so the sessions aren't split by company here.
 export const DEMO_AGENDA: [time: string, item: string][] = [
   ["14:30 – 15:00", "Registration"],
-  ["15:00 – 15:25", "Opening and welcome remarks"],
-  ["15:25 – 15:50", "Talk: the climate-tech ecosystem in Singapore"],
-  ["16:15 – 17:10", "IR pitching, session 1 (5 startups)"],
-  ["17:20 – 18:10", "IR pitching, session 2 (5 startups)"],
-  ["18:10 – 18:30", "Judges' deliberation and group photo"],
-  ["18:30 – 20:00", "Networking dinner"],
+  ["15:00 – 15:10", "Opening and programme introduction"],
+  ["15:10 – 15:25", "Talk: the climate-tech ecosystem in Singapore"],
+  ["15:25 – 15:30", "Introduction of the judges"],
+  ["15:30 – 16:20", "IR pitching, session 1 (5 startups)"],
+  ["16:20 – 16:40", "Break and networking"],
+  ["16:40 – 17:30", "IR pitching, session 2 (5 startups)"],
+  ["17:30 – 17:45", "Judges' remarks and group photo"],
+  ["17:45 – 20:00", "Networking dinner"],
 ];
 
 // ── Legacy side-track exports (no side track on this event) ─────────
