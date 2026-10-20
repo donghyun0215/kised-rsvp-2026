@@ -6,6 +6,7 @@ import zhenZhenOng from "@/assets/people/zhen-zhen-ong.jpg";
 // Added 20 Oct (Tammy); photos from their LinkedIn, greyscale like the others.
 import wonkiKim from "@/assets/people/wonki-kim.jpg";
 import daeroWon from "@/assets/people/daero-won.jpg";
+import jeremySim from "@/assets/people/jeremy-sim.jpg";
 
 export interface Person {
   name: string;
@@ -22,4 +23,5 @@ export const JUDGES: Person[] = [
   { name: "Zhen Zhen Ong", title: "", org: "Openspace Ventures", photo: zhenZhenOng },
   { name: "Won-Ki Kim", title: "", org: "Lighthouse Canton", photo: wonkiKim },
   { name: "Daero Won", title: "", org: "Translink Investment", photo: daeroWon },
+  { name: "Jeremy Sim", title: "", org: "Mistletoe", photo: jeremySim },
 ];
