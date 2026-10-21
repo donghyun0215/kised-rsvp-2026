@@ -148,88 +148,176 @@ ${ORDER.map((k) => blocks[k]).join("")}
 }
 
 // ── Second invitation (21 Oct, Tammy) ─────────────────────────────────
-// Reads as a personal note, not a newsletter: mostly text, one link, no
-// banner. Points Tammy asked for: Korea keeps choosing Singapore (and
-// Singapore is very good at being chosen); these ten are Korea's national
-// team, the final ten of the MSS × KAIST "모두의 챌린지 기후테크" (MSS press
-// release, 10 Sep 2026); five research-led pre-founding teams matched with
-// KAIST master's/PhD experts, five climate-tech companies; they already have
-// results here (MCE: Temasek Polytechnic MOU, Green Thumbs 2026 with MOS
-// Alvin Tan); and we want joint R&D and PoCs, not only investment.
-const GENERAL = ["theorigin", "reblock", "yulmix", "greenmrv", "apexion"]; // 일반리그 (pre-founders)
-const STARTUP = ["gigaette", "terracle", "refeed", "mce", "solarlease"]; // 스타트업리그
+// Two parts. On top, a short personal note in Tammy's own voice (warm,
+// plain sentences, an exclamation mark or two, signed "Tammy / LodestarT"),
+// with the cheeky opener she asked for: why does everyone want to come to
+// Singapore? Below, the eDM: a single card that sells the ten as Korea's
+// climate-tech national team. Facts: final ten of the MSS × KAIST "모두의
+// 챌린지 기후테크" (MSS press release, 10 Sep 2026; The Origin and GIGAette
+// won the top Minister's award in their leagues); five KAIST-matched
+// research teams + five companies; MCE's Temasek Polytechnic MOU and Green
+// Thumbs 2026 with MOS Alvin Tan (MCE LinkedIn, 18 Oct); ReFeed's Singapore
+// investors (one-pager). No images, so nothing is blocked or flagged.
+const LEAGUES: { title: string; sub: string; slugs: string[] }[] = [
+  { title: "Research league", sub: "Research-led teams, matched with KAIST master's and PhD experts", slugs: ["theorigin", "reblock", "yulmix", "greenmrv", "apexion"] },
+  { title: "Startup league", sub: "Climate-tech companies with proven technology", slugs: ["gigaette", "terracle", "refeed", "mce", "solarlease"] },
+];
+const SHORT: Record<string, string> = {
+  theorigin: "CO₂ into materials that biodegrade in soil and sea",
+  reblock: "Permeable paving blocks made from ceramic waste",
+  yulmix: "Catalyst nanomaterials made at room temperature, no solvents",
+  greenmrv: "Biochar and CO₂ mineralisation carbon-removal credits",
+  apexion: "Food-waste data that sends more waste to biogas",
+  gigaette: "Thermal batteries that turn waste heat into process heat",
+  terracle: "PET and textile waste back into virgin-grade raw material",
+  refeed: "A verified exchange for used cooking oil, the feedstock for SAF",
+  mce: "Mealworm microbes that turn styrofoam into fertiliser",
+  solarlease: "Zero-capex rooftop solar on subscription",
+};
+const TOP_AWARD = new Set(["theorigin", "gigaette"]);
 
 function buildSecondInvite(team: boolean): { subject: string; html: string; text: string } {
   const [I, me, sign] = team ? ["we", "us", "The LodestarT team"] : ["I", "me", "Tammy"];
-  const judges = JUDGES.map((j) => j.org.replace(/^Centre for Impact Investing and Practices \(CIIP\), /, "CIIP at ")).join(", ");
   const pitchStart = DEMO_AGENDA.find(([, item]) => /pitching/i.test(item))?.[0].split("–")[0].trim() ?? "";
-  const lineOf = (slug: string) => {
-    const c = companies.find((x) => x.slug === slug);
-    return c ? { name: c.name, line: LINES[slug] ?? c.tagline } : null;
-  };
+  const doors = EVENT_TIME.split("–")[0].trim();
+  const judges = JUDGES.map((j) => j.org.replace(/^Centre for Impact Investing and Practices \(CIIP\), Temasek Trust$/, "CIIP, Temasek Trust"));
+  const name = (slug: string) => companies.find((c) => c.slug === slug)?.name ?? slug;
 
-  const paras = [
-    `Have you noticed how many Korean delegations are landing in Singapore lately? Ministries, agencies, accelerators: everyone seems to want to be here. Honestly, Singapore makes it very easy to fall for it. You must be getting more invitations than ever (sorry, it must be tiring being this popular), so ${I}'ll keep this one short.`,
-    `Next week Korea is sending its climate-tech <b>national team</b>. These ten startups are the final ten of the 2026 Climate-tech Startup Challenge, a national competition run by Korea's Ministry of SMEs and Startups with KAIST. Five are research-led teams, matched with KAIST master's and PhD experts and already showing PoC results; the other five are established climate-tech companies with proven technology. The Origin and GIGAette took the Minister's top award in their leagues.`,
-    `They are not coming in cold, either. MCE, for one, has signed an MOU with Temasek Polytechnic's School of Applied Science for joint R&D, and was at Green Thumbs 2026, where Minister of State Alvin Tan set out Singapore's plan to greatly expand skyrise greenery by 2030; MCE's humic fertiliser is built for exactly those green walls.`,
-    `What they are looking for goes well beyond investment: <b>joint R&D, PoCs and pilots</b> with partners in Singapore. If any of them touches your work, ${I} would love for you to meet them.`,
-  ];
+  // ── the personal note (Tammy's voice)
+  const note = team
+    ? [
+        "Have you noticed? It feels like every Korean ministry and agency wants to come to Singapore these days. Singapore is just very good at attracting people, and we suspect you're enjoying being this popular! So we'll keep this short.",
+        `Next week, on <b>28 October</b>, Korea is bringing its <b>climate-tech national team</b> to Singapore: the final ten of a national competition run by the Ministry of SMEs and Startups with KAIST.`,
+        "They are already making progress here, and they are looking for more than investment: joint R&D, PoCs and pilots. If any of them could fit your work, we would love for you to come and meet them!",
+      ]
+    : [
+        "Have you noticed? It feels like every Korean ministry and agency wants to come to Singapore these days. Singapore is just very good at attracting people, and I suspect you're enjoying being this popular! So I'll keep this short.",
+        `Next week, on <b>28 October</b>, Korea is bringing its <b>climate-tech national team</b> to Singapore: the final ten of a national competition run by the Ministry of SMEs and Startups with KAIST.`,
+        "They are already making progress here, and they are looking for more than investment: joint R&D, PoCs and pilots. If any of them could fit your work, I would love for you to come and meet them!",
+      ];
 
-  const details: [string, string][] = [
-    [EVENT_DAY_SHORT, `Demo Day at ${EVENT_VENUE}, from ${EVENT_TIME.split("–")[0].trim()}. Pitching starts ${pitchStart}, followed by a networking dinner.`],
-    ...(ONE_ON_ONE_OPEN ? [["Thu 29 Oct", `Private 1:1 meetings with the startups you choose, ${MEETUP_TIME} at ${MEETUP_VENUE}.`] as [string, string]] : []),
-    ["Judges", judges],
-  ];
+  // ── palette (KISED CI)
+  const NIGHT = "#12162b", INDIGO = "#3b49c2", SKY = "#7fd3f2", PALE = "#eef1fa", INK = "#12162b", MUTED = "#5a6178", LINE = "#dfe3f0";
+  const H = "font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;";
+  const btn = (href: string, label: string, solid: boolean) =>
+    `<a href="${href}" style="display:inline-block;margin:0 8px 8px 0;padding:13px 20px;${H}font-size:14px;font-weight:bold;text-decoration:none;border-radius:3px;${
+      solid ? `background:${SKY};color:${NIGHT};` : `background:transparent;color:#ffffff;border:1.5px solid rgba(255,255,255,0.45);`
+    }">${label}</a>`;
 
-  const group = (title: string, slugs: string[]) => {
-    const rows = slugs.map(lineOf).filter(Boolean) as { name: string; line: string }[];
-    return { title, rows };
-  };
-  const groups = [
-    group("Research-led teams (KAIST-matched)", GENERAL),
-    group("Climate-tech companies", STARTUP),
-  ];
+  const stat = (big: string, small: string, pos: "first" | "mid" | "last") =>
+    `<td width="33%" valign="top" style="padding:18px 12px 18px ${pos === "first" ? "0" : "14px"};${pos === "last" ? "" : `border-right:1px solid ${LINE};`}"><div style="${H}font-size:30px;line-height:32px;font-weight:800;color:${INDIGO};letter-spacing:-1px;">${big}</div><div style="${H}padding-top:6px;font-size:12px;line-height:16px;color:${MUTED};">${small}</div></td>`;
 
-  const A = `color:${C.brand};font-weight:bold;`;
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:16px 12px;background:#ffffff;">
-<div style="max-width:580px;margin:0 auto;text-align:left;">
+  const roster = LEAGUES.map((L) => `
+<tr><td style="padding:22px 28px 6px;">
+  <div style="${H}font-size:15px;font-weight:800;color:${INK};">${esc(L.title)}</div>
+  <div style="${H}padding-top:2px;font-size:12px;color:${MUTED};">${esc(L.sub)}</div>
+</td></tr>
+<tr><td style="padding:4px 28px 0;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+  ${L.slugs.map((slug) => `<tr><td style="padding:9px 0;border-top:1px solid ${LINE};">
+    <a href="${SITE}/companies/${slug}" style="${H}font-size:14px;font-weight:bold;color:${INK};text-decoration:none;">${esc(name(slug))}</a>${
+      TOP_AWARD.has(slug) ? ` <span style="${H}display:inline-block;margin-left:6px;padding:2px 7px;font-size:10px;font-weight:bold;color:${NIGHT};background:${SKY};border-radius:2px;vertical-align:1px;">TOP AWARD</span>` : ""
+    }
+    <div style="${H}padding-top:2px;font-size:13px;line-height:18px;color:${MUTED};">${esc(SHORT[slug] ?? "")}</div>
+  </td></tr>`).join("")}
+  </table>
+</td></tr>`).join("");
+
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"></head>
+<body style="margin:0;padding:0;background:#ffffff;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;"><tr><td align="center" style="padding:20px 12px 28px;">
+
+<!-- the note -->
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;"><tr><td style="padding:0 4px 26px;text-align:left;">
 <p style="${P}">{{GREETING}}</p>
-${paras.map((l) => `<p style="${P}">${l}</p>`).join("\n")}
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin:4px 0 18px;border-left:3px solid ${C.brand};">
-${details.map(([k, v]) => `<tr><td style="padding:4px 14px;${F}font-size:13px;font-weight:bold;color:${C.ink};white-space:nowrap;vertical-align:top;">${esc(k)}</td><td style="padding:4px 14px 4px 0;${F}font-size:13px;line-height:19px;color:#333333;">${esc(v)}</td></tr>`).join("")}
+${note.map((l) => `<p style="${P}">${l}</p>`).join("\n")}
+<p style="margin:0;${F}font-size:14px;line-height:21px;color:#222222;">Regards,<br>${sign}${team ? "" : "<br>LodestarT"}</p>
+</td></tr></table>
+
+<!-- the eDM -->
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;border:1px solid ${LINE};border-radius:4px;overflow:hidden;">
+<tr><td style="background:${NIGHT};background-image:radial-gradient(120% 140% at 100% 0%,#2b3a9e 0%,${NIGHT} 58%);padding:30px 28px 28px;">
+  <div style="${H}font-size:12px;font-weight:bold;color:${SKY};">Singapore · 28–29 October 2026</div>
+  <div style="${H}padding-top:12px;font-size:34px;line-height:37px;font-weight:800;color:#ffffff;letter-spacing:-1px;">Korea's climate&#8209;tech<br>national team</div>
+  <div style="${H}padding-top:12px;font-size:14px;line-height:21px;color:#c9d0ea;">The final ten of the 2026 Climate-tech Startup Challenge, a national competition by Korea's Ministry of SMEs and Startups and KAIST.</div>
+  <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:20px;">
+    <tr><td style="padding:3px 16px 3px 0;${H}font-size:13px;font-weight:bold;color:#ffffff;white-space:nowrap;vertical-align:top;">${esc(EVENT_DAY_SHORT)}</td><td style="padding:3px 0;${H}font-size:13px;line-height:19px;color:#c9d0ea;">Demo Day at ${esc(EVENT_VENUE)}. Doors ${esc(doors)}, pitching ${esc(pitchStart)}, dinner after.</td></tr>
+    ${ONE_ON_ONE_OPEN ? `<tr><td style="padding:3px 16px 3px 0;${H}font-size:13px;font-weight:bold;color:#ffffff;white-space:nowrap;vertical-align:top;">Thu 29 Oct</td><td style="padding:3px 0;${H}font-size:13px;line-height:19px;color:#c9d0ea;">Private 1:1 meetings, ${esc(MEETUP_TIME)} at ${esc(MEETUP_VENUE)}.</td></tr>` : ""}
+  </table>
+  <div style="padding-top:22px;">${btn(`${SITE}/book?day=7`, "RSVP for the Demo Day", true)}${ONE_ON_ONE_OPEN ? btn(`${SITE}/book?day=5`, "Book a 1:1", false) : ""}</div>
+</td></tr>
+
+<tr><td style="padding:0 28px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+    ${stat("10", "finalists from a national selection", "first")}
+    ${stat("5 + 5", "research teams and climate&#8209;tech companies", "mid")}
+    ${stat("2", "top Minister's awards in the room", "last")}
+  </tr></table>
+</td></tr>
+
+<tr><td style="padding:0 28px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${PALE};border-left:4px solid ${INDIGO};border-radius:2px;"><tr><td style="padding:16px 18px;">
+    <div style="${H}font-size:12px;font-weight:bold;color:${INDIGO};">Already at work in Singapore</div>
+    <div style="${H}padding-top:8px;font-size:14px;line-height:21px;color:${INK};"><b>MCE</b> signed an MOU with Temasek Polytechnic for joint R&amp;D, and joined Green Thumbs 2026, where Minister of State Alvin Tan set out Singapore's plan to expand skyrise greenery by 2030. MCE's fertiliser is made for exactly those green walls.</div>
+    <div style="${H}padding-top:8px;font-size:14px;line-height:21px;color:${INK};"><b>ReFeed</b> is backed by institutional investors from Korea and Singapore.</div>
+  </td></tr></table>
+</td></tr>
+
+${roster}
+
+<tr><td style="padding:22px 28px 0;">
+  <div style="${H}font-size:12px;font-weight:bold;color:${INDIGO};">They are looking for</div>
+  <div style="padding-top:8px;">${["Joint R&amp;D", "PoCs and pilots", "Investment"].map((t) => `<span style="display:inline-block;margin:0 6px 6px 0;padding:7px 12px;${H}font-size:13px;font-weight:bold;color:${INK};background:${PALE};border-radius:3px;">${t}</span>`).join("")}</div>
+</td></tr>
+
+<tr><td style="padding:16px 28px 0;">
+  <div style="${H}font-size:12px;font-weight:bold;color:${INDIGO};">Pitching to judges from</div>
+  <div style="${H}padding-top:6px;font-size:13px;line-height:20px;color:${INK};">${judges.map(esc).join(" &nbsp;·&nbsp; ")}</div>
+</td></tr>
+
+<tr><td style="padding:24px 28px 28px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${NIGHT};border-radius:3px;"><tr><td style="padding:18px 20px;">
+    <div style="${H}font-size:15px;font-weight:bold;color:#ffffff;">${esc(EVENT_DATE)} · ${esc(EVENT_VENUE)}</div>
+    <div style="${H}padding-top:4px;font-size:13px;color:#c9d0ea;">${esc(EVENT_ADDRESS)}</div>
+    <div style="padding-top:14px;">${btn(`${SITE}/book?day=7`, "RSVP now", true)}<a href="${SITE}/#startups" style="${H}display:inline-block;padding:13px 4px;font-size:13px;font-weight:bold;color:${SKY};text-decoration:none;">See all ten profiles</a></div>
+  </td></tr></table>
+</td></tr>
 </table>
-<p style="${P}"><a href="${SITE}/book?day=7" style="${A}">RSVP for the Demo Day</a>${ONE_ON_ONE_OPEN ? ` &nbsp;or&nbsp; <a href="${SITE}/book?day=5" style="${A}">book a 1:1 meeting</a>` : ""}</p>
-<p style="${P}">Warm regards,<br>${sign}${team ? "" : "<br><span style=\"color:#777777;font-size:13px;\">Founder, LodestarT</span>"}</p>
-<div style="margin-top:22px;padding-top:14px;border-top:1px solid ${C.line};">
-${groups.map((g) => `<p style="margin:0 0 6px;${F}font-size:12px;font-weight:bold;color:${C.ink};">${esc(g.title)}</p>
-<p style="margin:0 0 14px;${F}font-size:12px;line-height:18px;color:#555555;">${g.rows.map((r) => `<b style="color:${C.ink};">${esc(r.name)}</b>: ${esc(r.line)}`).join("<br>")}</p>`).join("\n")}
-<p style="margin:0;${F}font-size:12px;"><a href="${SITE}/#startups" style="color:${C.brand};">Startup profiles</a></p>
-</div>
-<p style="margin:18px 0 0;${F}font-size:11px;color:#999999;">If you'd rather not hear from ${me} about events like this, just reply and let ${me} know.</p>
-</div>
+
+<p style="max-width:600px;margin:16px auto 0;${F}font-size:11px;line-height:16px;color:#9aa0b2;text-align:left;">Hosted by Korea's Ministry of SMEs and Startups and KISED, with LodestarT in Singapore. If you'd rather not hear from ${me} about events like this, just reply and let ${me} know.</p>
+</td></tr></table>
 </body></html>`;
 
-  const plain = (x: string) => x.replace(/<[^>]+>/g, "");
+  const plain = (x: string) => x.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&");
   const text = [
     "{{GREETING}}",
     "",
-    ...paras.map(plain).flatMap((l) => [l, ""]),
-    ...details.map(([k, v]) => `${k}: ${v}`),
-    "",
-    `RSVP for the Demo Day: ${SITE}/book?day=7`,
-    ...(ONE_ON_ONE_OPEN ? [`Book a 1:1 meeting: ${SITE}/book?day=5`] : []),
-    "",
-    "Warm regards,",
+    ...note.map(plain).flatMap((l) => [l, ""]),
+    "Regards,",
     sign,
-    ...(team ? [] : ["Founder, LodestarT"]),
+    ...(team ? [] : ["LodestarT"]),
     "",
     "----",
-    ...groups.flatMap((g) => [g.title, ...g.rows.map((r) => `${r.name}: ${r.line}`), ""]),
+    "KOREA'S CLIMATE-TECH NATIONAL TEAM · SINGAPORE, 28–29 OCTOBER 2026",
+    "The final ten of the 2026 Climate-tech Startup Challenge (Korea's Ministry of SMEs and Startups × KAIST).",
+    "",
+    `${EVENT_DAY_SHORT}: Demo Day at ${EVENT_VENUE}. Doors ${doors}, pitching ${pitchStart}, dinner after.`,
+    ...(ONE_ON_ONE_OPEN ? [`Thu 29 Oct: Private 1:1 meetings, ${MEETUP_TIME} at ${MEETUP_VENUE}.`] : []),
+    `RSVP: ${SITE}/book?day=7`,
+    ...(ONE_ON_ONE_OPEN ? [`Book a 1:1: ${SITE}/book?day=5`] : []),
+    "",
+    "Already at work in Singapore:",
+    "- MCE signed an MOU with Temasek Polytechnic for joint R&D, and joined Green Thumbs 2026, where Minister of State Alvin Tan set out Singapore's plan to expand skyrise greenery by 2030.",
+    "- ReFeed is backed by institutional investors from Korea and Singapore.",
+    "",
+    ...LEAGUES.flatMap((L) => [`${L.title}: ${L.sub}`, ...L.slugs.map((slug) => `- ${name(slug)}${TOP_AWARD.has(slug) ? " (top award)" : ""}: ${SHORT[slug] ?? ""}`), ""]),
+    "They are looking for: joint R&D, PoCs and pilots, investment.",
+    `Pitching to judges from: ${judges.join(", ")}`,
+    "",
     `Startup profiles: ${SITE}/#startups`,
     "",
     `If you'd rather not hear from ${me} about events like this, just reply and let ${me} know.`,
   ].join("\n");
 
-  return { subject: `Korea's climate-tech national team is in Singapore next week`, html, text };
+  return { subject: "Korea keeps choosing Singapore. Here's its climate-tech national team", html, text };
 }
