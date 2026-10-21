@@ -185,17 +185,14 @@ function buildSecondInvite(team: boolean): { subject: string; html: string; text
   const name = (slug: string) => companies.find((c) => c.slug === slug)?.name ?? slug;
 
   // ── the personal note (Tammy's voice)
-  const note = team
-    ? [
-        "Have you noticed? It feels like every Korean ministry and agency wants to come to Singapore these days. Singapore is just very good at attracting people, and we suspect you're enjoying being this popular! So we'll keep this short.",
-        `Next week, on <b>28 October</b>, Korea is bringing its <b>climate-tech national team</b> to Singapore: the final ten of a national competition run by the Ministry of SMEs and Startups with KAIST.`,
-        "They are already making progress here, and they are looking for more than investment: joint R&D, PoCs and pilots. If any of them could fit your work, we would love for you to come and meet them!",
-      ]
-    : [
-        "Have you noticed? It feels like every Korean ministry and agency wants to come to Singapore these days. Singapore is just very good at attracting people, and I suspect you're enjoying being this popular! So I'll keep this short.",
-        `Next week, on <b>28 October</b>, Korea is bringing its <b>climate-tech national team</b> to Singapore: the final ten of a national competition run by the Ministry of SMEs and Startups with KAIST.`,
-        "They are already making progress here, and they are looking for more than investment: joint R&D, PoCs and pilots. If any of them could fit your work, I would love for you to come and meet them!",
-      ];
+  // Tammy's own wording (21 Oct): she dropped the "everyone wants to come
+  // to Singapore" opener and rewrote the rest.
+  const body = (who: "I" | "we") => [
+    `Next week, on October 28th, Korea is bringing its <b>&ldquo;Climate-Tech National Team&rdquo;</b> to Singapore. This delegation features the top ten finalists of the national &ldquo;Modu's Startup Climate Tech Challenge,&rdquo; organized by the Ministry of SMEs and Startups in collaboration with KAIST.`,
+    "The group consists of five researchers ready to commercialize their cutting-edge research and five innovative startups tackling climate challenges with real-world technological solutions. They are already making great progress and are actively looking for more than just investment&mdash;they are seeking <b>joint R&amp;D, proof-of-concepts (PoCs), pilot projects, and business partnerships</b> in Singapore.",
+    `If any of these innovative teams align with your work or interests, ${who} would love for you to come and meet them.`,
+  ];
+  const note = team ? body("we") : body("I");
 
   // ── palette (KISED CI)
   const NIGHT = "#12162b", INDIGO = "#3b49c2", SKY = "#7fd3f2", PALE = "#eef1fa", INK = "#12162b", MUTED = "#5a6178", LINE = "#dfe3f0";
@@ -289,7 +286,8 @@ ${roster}
 </td></tr></table>
 </body></html>`;
 
-  const plain = (x: string) => x.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&");
+  const plain = (x: string) =>
+    x.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&ldquo;|&rdquo;/g, '"').replace(/&mdash;/g, "—");
   const text = [
     "{{GREETING}}",
     "",
@@ -319,5 +317,6 @@ ${roster}
     `If you'd rather not hear from ${me} about events like this, just reply and let ${me} know.`,
   ].join("\n");
 
-  return { subject: "Korea keeps choosing Singapore. Here's its climate-tech national team", html, text };
+  // Subject follows the note now that the "Korea keeps choosing Singapore" opener is gone.
+  return { subject: "Korea's Climate-Tech National Team is coming to Singapore on 28 October", html, text };
 }
