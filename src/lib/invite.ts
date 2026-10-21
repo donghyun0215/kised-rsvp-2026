@@ -149,7 +149,8 @@ ${ORDER.map((k) => blocks[k]).join("")}
 
 // ── Second invitation (21 Oct, Tammy) ─────────────────────────────────
 // Two parts. On top, a short personal note in Tammy's own voice (warm,
-// plain sentences, an exclamation mark or two, signed "Tammy / LodestarT"),
+// plain sentences, an exclamation mark or two; signed as Vice Chairman of
+// the Korea Chamber of Commerce in Singapore, at her request),
 // with the cheeky opener she asked for: why does everyone want to come to
 // Singapore? Below, the eDM: a single card that sells the ten as Korea's
 // climate-tech national team. Facts: final ten of the MSS × KAIST "모두의
@@ -231,7 +232,7 @@ function buildSecondInvite(team: boolean): { subject: string; html: string; text
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;"><tr><td style="padding:0 4px 26px;text-align:left;">
 <p style="${P}">{{GREETING}}</p>
 ${note.map((l) => `<p style="${P}">${l}</p>`).join("\n")}
-<p style="margin:0;${F}font-size:14px;line-height:21px;color:#222222;">Regards,<br>${sign}${team ? "" : "<br>LodestarT"}</p>
+<p style="margin:0;${F}font-size:14px;line-height:21px;color:#222222;">Warm regards,<br>${team ? sign : "Tammy Ahn<br><span style=\"color:#666666;\">Vice Chairman of Korea Chamber of Commerce in Singapore</span>"}</p>
 </td></tr></table>
 
 <!-- the eDM -->
@@ -293,9 +294,8 @@ ${roster}
     "{{GREETING}}",
     "",
     ...note.map(plain).flatMap((l) => [l, ""]),
-    "Regards,",
-    sign,
-    ...(team ? [] : ["LodestarT"]),
+    "Warm regards,",
+    ...(team ? [sign] : ["Tammy Ahn", "Vice Chairman of Korea Chamber of Commerce in Singapore"]),
     "",
     "----",
     "KOREA'S CLIMATE-TECH NATIONAL TEAM · SINGAPORE, 28–29 OCTOBER 2026",
