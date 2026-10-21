@@ -598,7 +598,7 @@ function RsvpPage() {
                     <div key={c.slug} className="rounded-xl border border-border bg-card p-3.5">
                       <div className="font-semibold text-navy">{c.name}</div>
                       <div className="text-xs text-muted-foreground">{c.sector}</div>
-                      <div className="mt-3 grid grid-cols-2 gap-2 min-[420px]:grid-cols-4">
+                      <div className="mt-3 grid grid-cols-3 gap-2">
                         {TIMESLOTS.map((t) => {
                           if (!isSlotOffered(c.slug, t.id)) {
                             return (
@@ -640,12 +640,17 @@ function RsvpPage() {
                   ))}
                 </div>
                 <div className="mt-4 hidden overflow-x-auto rounded-xl border border-border bg-card sm:block">
-                  <table className="w-full min-w-[560px] border-collapse text-sm">
+                  {/* Fixed layout: equal round columns, one same-size pill per cell, centred. */}
+                  <table className="w-full min-w-[560px] table-fixed border-collapse text-sm">
+                    <colgroup>
+                      <col className="w-[34%]" />
+                      {TIMESLOTS.map((t) => <col key={t.id} />)}
+                    </colgroup>
                     <thead>
-                      <tr className="bg-secondary text-left text-navy">
-                        <th className="p-3 font-semibold">Startup</th>
+                      <tr className="bg-secondary text-navy">
+                        <th className="p-3 text-left font-semibold">Startup</th>
                         {TIMESLOTS.map((t) => (
-                          <th key={t.id} className="p-3 font-semibold">
+                          <th key={t.id} className="p-3 text-center font-semibold">
                             {t.label}
                             <div className="text-xs font-normal text-muted-foreground">{t.time}</div>
                           </th>
@@ -662,7 +667,7 @@ function RsvpPage() {
                           {TIMESLOTS.map((t) => {
                             if (!isSlotOffered(c.slug, t.id)) {
                               return (
-                                <td key={t.id} className="p-3">
+                                <td key={t.id} className="p-3 text-center">
                                   <span className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-muted-foreground/40">
                                     —
                                   </span>
@@ -675,13 +680,13 @@ function RsvpPage() {
                             const isSelected = selections[t.id] === c.slug;
                             const disabled = loading || isBooked || isMine || iHaveThisRound;
                             return (
-                              <td key={t.id} className="p-3">
+                              <td key={t.id} className="p-3 text-center">
                                 {isMine ? (
-                                  <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-800">
+                                  <span className="inline-flex h-8 w-28 items-center justify-center gap-1.5 rounded-full bg-green-100 text-xs font-semibold text-green-800">
                                     ✓ Booked
                                   </span>
                                 ) : isBooked ? (
-                                  <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+                                  <span className="inline-flex h-8 w-28 items-center justify-center gap-1.5 rounded-full bg-muted text-xs font-semibold text-muted-foreground">
                                     Full
                                   </span>
                                 ) : (
@@ -690,7 +695,7 @@ function RsvpPage() {
                                     disabled={disabled}
                                     onClick={() => toggleSelection(t.id, c.slug)}
                                     title={iHaveThisRound ? "You already have a meeting in this round" : undefined}
-                                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-40 ${
+                                    className={`inline-flex h-8 w-28 items-center justify-center gap-1.5 rounded-full text-xs font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-40 ${
                                       isSelected
                                         ? "bg-navy text-white"
                                         : "bg-primary text-primary-foreground hover:bg-primary/90"

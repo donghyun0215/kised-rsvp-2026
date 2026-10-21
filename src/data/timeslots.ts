@@ -33,14 +33,16 @@ export const EVENT_MAP_URL =
 // Public 1:1 self-booking, same model as KIMST/CMK.
 export const ONE_ON_ONE_OPEN = true;
 
-// 1:1 meetings Thu 29 Oct: two rounds starting 10:30 and 11:20 (Lodestart
-// internship sheet, 12 Oct), 40 min each like CMK. IDs are stable references
-// stored in bookings — change labels/times freely, never the ids.
+// 1:1 meetings Thu 29 Oct: rounds start 09:40, 10:30 and 11:20, 40 min each
+// like CMK. The 09:40 round was added on 21 Oct at MYSC's request, so it
+// carries a new id (slot0) and the later rounds keep theirs. IDs are stable
+// references stored in bookings — change labels/times freely, never the ids.
 export const TIMESLOTS: Timeslot[] = [
-  { id: "slot1", label: "Round 1", time: "10:30 – 11:10" },
-  { id: "slot2", label: "Round 2", time: "11:20 – 12:00" },
+  { id: "slot0", label: "Round 1", time: "09:40 – 10:20" },
+  { id: "slot1", label: "Round 2", time: "10:30 – 11:10" },
+  { id: "slot2", label: "Round 3", time: "11:20 – 12:00" },
 ];
-export const MEETUP_TIME = "10:30 – 12:00";
+export const MEETUP_TIME = "09:40 – 12:00";
 export const MEETUP_DATE = "Thursday, 29 October 2026";
 export const MEETUP_DAY_SHORT = "Thu 29 Oct";
 // NULDAM Space, confirmed by Tammy, 14 Oct.
