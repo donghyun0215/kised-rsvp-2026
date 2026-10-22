@@ -1,3 +1,4 @@
+import { companies } from "./companies";
 export interface Timeslot {
   id: string;
   label: string;
@@ -91,16 +92,27 @@ export const PROGRAM: ProgramBlock[] = [
 // Demo Day run of show (timetable 0921). Shown on the RSVP page.
 // Run of show moved earlier (MYSC "IR Demoday 행사 일정" tab, 20 Oct, from
 // the 19 Oct ops meeting): shorter opening and talk, pitching from 15:30,
-// a 20-minute break between sessions, dinner from 17:45. Pitch order is
-// still draft, so the sessions aren't split by company here.
-export const DEMO_AGENDA: [time: string, item: string][] = [
+// a 20-minute break between sessions, dinner from 17:45.
+// Pitch order confirmed by MYSC on 22 Oct (timetable and cue sheet).
+export const PITCH_ORDER = [
+  "gigaette", "solarlease", "refeed", "mce", "terracle",
+  "apexion", "greenmrv", "reblock", "theorigin", "yulmix",
+] as const;
+export const PITCH_SESSIONS: string[][] = [PITCH_ORDER.slice(0, 5), PITCH_ORDER.slice(5)];
+export const pitchNumber = (slug: string) => (PITCH_ORDER as readonly string[]).indexOf(slug) + 1;
+// Names as the founders present them on stage.
+const PITCH_NAMES: Record<string, string> = { solarlease: "Deep Renewables (Solarlease)" };
+export const pitchName = (slug: string) => PITCH_NAMES[slug] ?? companies.find((c) => c.slug === slug)?.name ?? slug;
+
+// Third element: slugs pitching in that slot, in order.
+export const DEMO_AGENDA: [time: string, item: string, pitches?: string[]][] = [
   ["14:30 – 15:00", "Registration"],
   ["15:00 – 15:10", "Opening and programme introduction"],
   ["15:10 – 15:25", "Talk: the climate-tech ecosystem in Singapore"],
   ["15:25 – 15:30", "Introduction of the judges"],
-  ["15:30 – 16:20", "IR pitching, session 1 (5 startups)"],
+  ["15:30 – 16:20", "IR pitching, session 1", PITCH_SESSIONS[0]],
   ["16:20 – 16:40", "Break and networking"],
-  ["16:40 – 17:30", "IR pitching, session 2 (5 startups)"],
+  ["16:40 – 17:30", "IR pitching, session 2", PITCH_SESSIONS[1]],
   ["17:30 – 17:45", "Judges' remarks and group photo"],
   ["17:45 – 20:00", "Networking dinner"],
 ];

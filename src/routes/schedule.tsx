@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Wordmark } from "@/components/Wordmark";
 import { useEffect, useState } from "react";
 import { companies, MEETUP_COMPANIES } from "@/data/companies";
-import { CREDITS, DEMO_AGENDA, EVENT_VENUE, MEETUP_DAY_SHORT, MEETUP_TIME, MEETUP_VENUE, TIMESLOTS, isSlotOffered, EVENT_NAME } from "@/data/timeslots";
+import { CREDITS, DEMO_AGENDA, PITCH_ORDER, pitchName, EVENT_VENUE, MEETUP_DAY_SHORT, MEETUP_TIME, MEETUP_VENUE, TIMESLOTS, isSlotOffered, EVENT_NAME } from "@/data/timeslots";
 import { fetchMeetingRoster, type RosterEntry } from "@/lib/booking.server";
 import { LoadingNote } from "@/components/Spinner";
 import { absUrl } from "@/lib/url";
@@ -73,7 +73,7 @@ const DAYS: ScheduleDay[] = [
     items: [
       { time: "10:00 – 12:00", title: "On-site briefing & pitch rehearsal", venue: EVENT_VENUE },
       { time: "12:00 – 14:30", title: "Lunch & final venue prep" },
-      ...DEMO_AGENDA.map(([time, title]) => ({ time, title, highlight: /pitching|Registration/.test(title) })),
+      ...DEMO_AGENDA.map(([time, title, pitches]) => ({ time, title, highlight: /pitching|Registration/.test(title), ...(pitches ? { note: pitches.map(pitchName).join(" → ") } : {}) })),
     ],
   },
   {
@@ -95,7 +95,7 @@ const TRACK_META = [
     id: "t1",
     label: "Cohort",
     title: EVENT_NAME,
-    companies: companies.map((c) => c.name).join(" · "),
+    companies: PITCH_ORDER.map(pitchName).join(" · "),
     period: "Mon 26 Oct – Thu 29 Oct",
     days: DAYS,
     note: "Provisional (TBC); venues and times may still change." as string | null,

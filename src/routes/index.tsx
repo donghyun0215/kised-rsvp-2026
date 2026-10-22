@@ -10,6 +10,7 @@ import { companies } from "@/data/companies";
 import { STARTUP_IMAGES, STARTUP_LOGOS } from "@/data/companyImages";
 import {
   EVENT_ADDRESS,
+  pitchNumber,
   EVENT_DAY_SHORT,
   EVENT_MAP_URL,
   EVENT_NAME,
@@ -321,11 +322,11 @@ function Landing() {
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24">
           <h2 data-reveal className="text-3xl font-bold text-navy md:text-4xl">The startups</h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Open a profile for the full one-pager, or book a 1:1 straight away.
+            In Demo Day pitch order. Open a profile for the full one-pager, or book a 1:1 straight away.
           </p>
 
           <div className="mt-10 grid grid-cols-2 gap-3 [perspective:1200px] sm:gap-4 lg:grid-cols-5">
-            {companies.map((c, i) => (
+            {[...companies].sort((a, b) => pitchNumber(a.slug) - pitchNumber(b.slug)).map((c, i) => (
               <article key={c.slug} data-reveal style={{ "--rd": `${(i % 5) * 70}ms` } as CSSProperties} data-tilt className="card-startup tilt group flex flex-col overflow-hidden rounded-xl">
                 <Link to="/companies/$slug" params={{ slug: c.slug }} className="block aspect-[3/2] overflow-hidden bg-muted">
                   <img

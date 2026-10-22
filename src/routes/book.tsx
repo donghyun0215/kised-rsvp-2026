@@ -8,6 +8,8 @@ import {
   EVENT_DATE,
   EVENT_DAY_SHORT,
   DEMO_AGENDA,
+  pitchName,
+  pitchNumber,
   EVENT_TIME,
   EVENT_VENUE,
   EVENT_ADDRESS,
@@ -550,10 +552,22 @@ function RsvpPage() {
 
             {day === "7" && (
               <div className="mt-5 divide-y divide-border rounded-xl border border-border bg-background">
-                {DEMO_AGENDA.map(([time, label]) => (
-                  <div key={time} className="flex items-center gap-4 px-4 py-3.5">
+                {DEMO_AGENDA.map(([time, label, pitches]) => (
+                  <div key={time} className={`flex gap-4 px-4 py-3.5 ${pitches ? "items-start" : "items-center"}`}>
                     <span className="w-28 shrink-0 text-sm font-bold text-primary">{time}</span>
-                    <span className="text-sm font-semibold text-navy">{label}</span>
+                    <div className="min-w-0">
+                      <span className="text-sm font-semibold text-navy">{label}</span>
+                      {pitches && (
+                        <ol className="mt-1.5 flex flex-col gap-y-1 text-[13px] text-muted-foreground sm:flex-row sm:flex-wrap sm:gap-x-3">
+                          {pitches.map((slug) => (
+                            <li key={slug}>
+                              <span className="mr-1 font-semibold text-primary">{pitchNumber(slug)}</span>
+                              {pitchName(slug)}
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
