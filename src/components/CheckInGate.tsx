@@ -29,6 +29,15 @@ const T = {
   error: "text-[13px] leading-relaxed text-rose-300",
   done: "rounded-2xl border border-white/15 bg-white/[0.06] p-6 backdrop-blur-sm",
   tick: "flex h-12 w-12 items-center justify-center rounded-full bg-[#86efac] text-[#06210f]",
+  donePrimary:
+    "inline-flex items-center justify-center gap-2 rounded-full bg-yellow px-6 py-3 text-sm font-semibold text-yellow-foreground transition hover:brightness-110",
+  big: "font-display text-[28px] font-bold leading-tight tracking-tight text-white",
+  sub: "text-[16px] text-white/75",
+  faint: "text-white/40",
+  note: "text-sm leading-relaxed text-white/60",
+  chip: "rounded-full border px-3 py-1.5 text-[13px] transition",
+  chipOn: "border-yellow bg-yellow/15 text-white",
+  chipOff: "border-white/20 text-white/65 hover:border-white/45",
 };
 
 export function CheckInGate(props: { loungeKey: string; onEnter: (me: CheckedInAs) => void; onUseEmail: () => void }) {
@@ -124,13 +133,13 @@ function Steps({
             <path d="M5 12.5l4.5 4.5L19 7.5" />
           </svg>
         </span>
-        <p className="mt-5 font-display text-[28px] font-bold leading-tight tracking-tight text-white">{counted ? "You're checked in" : "You're in"}</p>
-        <p className="mt-1 text-[17px] text-white/80">
+        <p className={`${T.big} mt-5`}>{counted ? "You're checked in" : "You're in"}</p>
+        <p className={`${T.sub} mt-1`}>
           {me.name}
-          {counted && <span className="text-white/45">, {at}</span>}
+          {counted && <span className={T.faint}>, {at}</span>}
         </p>
-        {counted && <p className="mt-4 text-sm leading-relaxed text-white/60">Show this screen at the desk to collect your name badge.</p>}
-        <button type="button" onClick={() => onEnter(me)} className={`${T.primary} mt-6 w-full sm:w-auto`}>
+        {counted && <p className={`${T.note} mt-4`}>Show this screen at the desk to collect your name badge.</p>}
+        <button type="button" onClick={() => onEnter(me)} className={`${T.donePrimary} mt-6 w-full sm:w-auto`}>
           Enter the lounge
         </button>
       </div>
@@ -141,9 +150,9 @@ function Steps({
     return (
       <div>
         <p className={T.label}>Is this you?</p>
-        <p className="mt-3 font-display text-[28px] font-bold leading-tight tracking-tight text-white">{pick.full_name}</p>
-        <p className="mt-1 text-[15px] text-white/60">
-          {pick.organisation} <span className="text-white/35">· {pick.hint}</span>
+        <p className={`${T.big} mt-3`}>{pick.full_name}</p>
+        <p className={`${T.sub} mt-1`}>
+          {pick.organisation} <span className={T.faint}>· {pick.hint}</span>
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-5">
           <button type="button" onClick={() => void confirm()} disabled={busy} className={T.primary}>
@@ -184,9 +193,7 @@ function Steps({
                 type="button"
                 aria-pressed={w.primaryInterest === i}
                 onClick={() => setW((v) => ({ ...v, primaryInterest: i }))}
-                className={`rounded-full border px-3 py-1.5 text-[13px] transition ${
-                  w.primaryInterest === i ? "border-yellow bg-yellow/15 text-white" : "border-white/20 text-white/65 hover:border-white/45"
-                }`}
+                className={`${T.chip} ${w.primaryInterest === i ? T.chipOn : T.chipOff}`}
               >
                 {i}
               </button>
