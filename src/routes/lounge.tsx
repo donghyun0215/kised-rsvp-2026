@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Wordmark } from "@/components/Wordmark";
-import { useMemo, useState } from "react";
-import { CREDITS, EVENT_NAME } from "@/data/timeslots";
+import { useMemo, useState, type CSSProperties } from "react";
+import sphereArt from "@/assets/ci/sphere.webp";
+import horizonArt from "@/assets/ci/horizon.webp";
+import { CREDITS, EVENT_NAME, pitchNumber } from "@/data/timeslots";
 import { companies } from "@/data/companies";
 import { STARTUP_LOGOS } from "@/data/companyImages";
 import {
@@ -39,6 +41,14 @@ export const Route = createFileRoute("/lounge")({
   }),
 });
 
+// Night palette: one hue per RSVP interest, legible on #0c1024.
+const INTEREST_HUE: Record<string, string> = {
+  Investment: "#7fd3f2",
+  "Distribution / partnership": "#a5b4fc",
+  "Pilot / trial opportunity": "#86efac",
+  "General interest": "#94a3b8",
+};
+
 // Matches the exact values offered on the RSVP form.
 const CHIP_COLORS: Record<string, string> = {
   Investment: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
@@ -53,10 +63,10 @@ const BAR_COLORS: Record<string, string> = {
   "General interest": "bg-slate-400",
 };
 
-// Forest palette — kept within one family so a full wall of avatars reads
+// Night palette — kept within one family so a full wall of avatars reads
 // as one surface rather than a rainbow.
 const AVATAR_COLORS = [
-  "#0F2F2A", "#1E6B4F", "#2F8F6A", "#3E6B5C", "#4A7A3F", "#24574A", "#5B7F2E", "#2C4F45",
+  "#1f2a5c", "#24356e", "#2b3f80", "#1d3a5e", "#263066", "#2e3a74", "#22406b", "#2a2f6a",
 ];
 
 function avatarColor(name: string): string {
@@ -91,53 +101,6 @@ function LockGlyph({ className }: { className?: string }) {
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
       <rect x="5" y="11" width="14" height="9" rx="2" />
       <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-    </svg>
-  );
-}
-
-function DotGrid({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden="true" className={className} fill="currentColor">
-      <defs>
-        <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse">
-          <circle cx="2" cy="2" r="1.6" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#dots)" />
-    </svg>
-  );
-}
-
-// Faint marine glyphs — the subject's own vocabulary, kept quiet enough that
-// the type stays the loudest thing on the screen.
-function MarineWatermark() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-0 h-full w-full text-navy opacity-[0.045]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <defs>
-        <pattern id="marine" width="112" height="112" patternUnits="userSpaceOnUse">
-          {/* waves */}
-          <path d="M8 22c6-6 12-6 18 0s12 6 18 0" />
-          <path d="M8 30c6-6 12-6 18 0s12 6 18 0" />
-          {/* hull */}
-          <path d="M70 34h26l-5 9H75z" />
-          <path d="M83 34V20l12 6-12 4" />
-          {/* buoy / sensor */}
-          <circle cx="24" cy="80" r="9" />
-          <path d="M24 71v-8M24 89v8" />
-          {/* propeller-ish rotor */}
-          <path d="M84 78l10-6M84 78l10 6M84 78l-11 0" />
-          <circle cx="84" cy="78" r="3" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#marine)" />
     </svg>
   );
 }
@@ -265,401 +228,189 @@ function LoungePage() {
     setLinkedOnly(false);
   };
 
+  // Night-sky palette for the wall: one hue per interest, read against #0c1024.
+  const hueOf = (label: string | null) => INTEREST_HUE[label || "General interest"] ?? "#94a3b8";
+  const viewTitle = view === "mine" ? "My Contacts" : view === "team" ? "Team view" : "Attendees";
+  const roster = [...companies].sort((a, b) => pitchNumber(a.slug) - pitchNumber(b.slug));
+  const enter = () => email.trim() && void load(key ? { key, email: email.trim() } : { email: email.trim() });
+
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-secondary/40">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+    <div className="lounge-night min-h-screen w-full overflow-x-hidden bg-background text-navy">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
           <Link to="/" className="flex min-w-0 items-center">
-            <Wordmark compact />
+            <Wordmark light compact />
           </Link>
-          <nav className="flex shrink-0 items-center gap-1.5 sm:gap-3">
-            <Link
-              to="/"
-              className="rounded-full bg-secondary px-2.5 py-1.5 text-[11px] font-semibold text-secondary-foreground transition hover:bg-accent sm:px-4 sm:py-2 sm:text-sm"
-            >
+          <nav className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <Link to="/" className="rounded-full px-3 py-2 text-[13px] font-medium text-muted-foreground transition hover:text-navy">
               Home
             </Link>
-            <Link
-              to="/"
-              hash="startups"
-              className="hidden rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-secondary-foreground transition hover:bg-accent sm:block"
-            >
+            <Link to="/" hash="startups" className="hidden rounded-full px-3 py-2 text-[13px] font-medium text-muted-foreground transition hover:text-navy sm:block">
               Startups
             </Link>
-            <Link
-              to="/book"
-              className="rounded-full bg-primary px-2.5 py-1.5 text-[11px] font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 sm:px-4 sm:py-2 sm:text-sm"
-            >
-              Event RSVP<span className="hidden sm:inline"> (28 Oct)</span>
+            <Link to="/book" className="rounded-full border border-border px-3.5 py-2 text-[13px] font-semibold text-navy transition hover:border-yellow hover:text-yellow">
+              RSVP<span className="hidden sm:inline"> · 28 Oct</span>
             </Link>
           </nav>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-7xl px-4 pb-16 pt-6 sm:px-6 sm:pt-8">
+      <main>
         {!profiles ? (
           <>
-            {/* ── HERO ── */}
-            <section className="relative -mx-4 -mt-6 overflow-hidden bg-navy px-4 pb-14 pt-10 sm:-mx-6 sm:-mt-8 sm:px-6 sm:pb-16 sm:pt-12">
-              {/* decorative field */}
-              <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-                <DotGrid className="absolute left-6 top-8 h-20 w-32 text-white/25" />
-                <DotGrid className="absolute bottom-10 left-1/3 h-16 w-24 text-white/15" />
-                <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full border-[10px] border-white/10" />
-                <div className="absolute right-1/3 top-6 h-0 w-0 border-b-[26px] border-l-[16px] border-r-[16px] border-b-white/15 border-l-transparent border-r-transparent rotate-[24deg]" />
-                <div className="absolute -bottom-20 -left-14 h-48 w-48 rounded-full bg-white/5" />
+            {/* ── GATE: the home page's night sky, with tonight's line-up as a ledger ── */}
+            <section className="relative isolate overflow-hidden bg-hero-gradient text-white">
+              <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                <img src={sphereArt} alt="" className="orb orb-glow absolute -top-14 left-[44%] w-[150px] opacity-90 max-lg:left-auto max-lg:right-[-30px] max-lg:w-[120px]" />
+                <img src={horizonArt} alt="" className="orb orb-slow orb-glow absolute -bottom-[1010px] left-1/2 w-[1700px] max-w-none -translate-x-1/2 opacity-70 max-lg:-bottom-[560px] max-lg:w-[960px]" />
               </div>
-
-              <div className="relative mx-auto grid max-w-6xl items-center gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
-                <div className="order-2 lg:order-1">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-yellow">
-                    {EVENT_NAME}
-                  </div>
-                  <h1
-                    className="mt-3 text-[32px] font-extrabold leading-[1.12] tracking-tight text-white sm:text-[42px]"
-                    style={{ fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif' }}
-                  >
-                    Welcome to
+              <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] gap-14 px-4 pb-28 pt-14 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-20 lg:pb-40 lg:pt-24">
+                <div>
+                  <p className="hero-in text-[13px] font-semibold text-yellow" style={{ "--i": 0 } as CSSProperties}>
+                    Virtual Networking Lounge · Wed 28 Oct
+                  </p>
+                  <h1 className="hero-in mt-5 font-display text-[clamp(46px,6.4vw,88px)] font-bold leading-[0.96] tracking-[-0.035em]" style={{ "--i": 1 } as CSSProperties}>
+                    Who's in
                     <br />
-                    Virtual Networking Lounge
+                    the room.
                   </h1>
-                  <p className="mt-4 max-w-md text-[15px] leading-relaxed text-white/85">
-                    Connect, collaborate, and explore opportunities with innovators, investors, and
-                    partners in the climate tech ecosystem.
+                  <p className="hero-in mt-6 max-w-md text-[17px] leading-relaxed text-white/70" style={{ "--i": 2 } as CSSProperties}>
+                    Investors, corporates and partners meeting Korea's climate-tech national team. Find the people you
+                    came for, save the ones you meet, and follow up after.
                   </p>
 
-                  {/* gate card — email is always required; the QR key on top
-                      of it is what marks on-site attendance */}
-                  <div className="mt-7 max-w-md rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm sm:p-5">
-                    <div className="text-sm font-bold text-white">
-                      {key ? "You're at the event — enter your RSVP email to check in" : "To enter the lounge, input your email"}
-                    </div>
-                    <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                  <form
+                    className="hero-in mt-12 max-w-md"
+                    style={{ "--i": 3 } as CSSProperties}
+                    onSubmit={(e) => { e.preventDefault(); enter(); }}
+                  >
+                    <label htmlFor="lounge-email" className="text-[13px] text-white/60">
+                      {key ? "You're at the venue. Enter your RSVP email to check in." : "Enter with the email you RSVP'd with"}
+                    </label>
+                    <div className="mt-2 flex items-end gap-4 border-b border-white/25 transition-colors focus-within:border-yellow">
                       <input
+                        id="lounge-email"
                         type="email"
+                        inputMode="email"
+                        autoComplete="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && email.trim() && void load(key ? { key, email: email.trim() } : { email: email.trim() })}
-                        placeholder="Enter your email address"
-                        className="min-w-0 flex-1 rounded-lg border border-white/30 bg-white px-3 py-2.5 text-base text-navy placeholder:text-slate-400 sm:text-sm"
+                        placeholder="you@company.com"
+                        className="min-w-0 flex-1 bg-transparent py-3 font-display text-[22px] font-medium tracking-tight text-white outline-none placeholder:text-white/25"
                       />
                       <button
-                        type="button"
+                        type="submit"
                         disabled={!email.trim() || loading}
-                        onClick={() => void load(key ? { key, email: email.trim() } : { email: email.trim() })}
-                        className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-50"
+                        className="group mb-2.5 inline-flex shrink-0 items-center gap-2 rounded-full bg-yellow px-5 py-2.5 text-sm font-semibold text-yellow-foreground transition hover:brightness-110 disabled:opacity-40"
                       >
                         <BusyLabel busy={loading} text="Checking…">
-                          Enter lounge <span aria-hidden="true">→</span>
+                          Enter <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
                         </BusyLabel>
                       </button>
                     </div>
-                    {gateError && (
-                      <p className="mt-2.5 text-xs leading-relaxed text-rose-200">
+                    {gateError ? (
+                      <p role="alert" className="mt-3 text-[13px] leading-relaxed text-rose-300">
                         {gateError}{" "}
-                        <a href="/book" className="font-semibold text-white underline underline-offset-2">
-                          RSVP here →
-                        </a>
+                        <a href="/book" className="font-semibold text-white underline underline-offset-4">RSVP here</a>
+                      </p>
+                    ) : (
+                      <p className="mt-3 flex items-center gap-1.5 text-[12px] text-white/45">
+                        <LockGlyph className="h-3 w-3 shrink-0" /> RSVP attendees only
                       </p>
                     )}
-                    <p className="mt-3 flex items-start gap-1.5 text-[11px] leading-relaxed text-white/75">
-                      <LockGlyph className="mt-0.5 h-3 w-3 shrink-0" />
-                      RSVP attendees only. Please use the email you registered with.
-                    </p>
-                  </div>
+                  </form>
                 </div>
 
-                {/* Who's in the room: the ten startup logos on white tiles */}
-                <div className="relative order-1 mx-auto w-full max-w-[320px] lg:order-2 lg:max-w-[440px]">
-                  <div className="grid grid-cols-5 gap-2 lg:grid-cols-2 lg:gap-3">
-                    {companies.map((c) => (
-                      <div key={c.slug} className="flex aspect-[3/2] items-center justify-center rounded-lg bg-white p-2 lg:aspect-[5/2] lg:p-3">
-                        <img src={STARTUP_LOGOS[c.slug]} alt={c.name} className="max-h-full max-w-full object-contain" />
-                      </div>
+                <div className="hero-in self-end" style={{ "--i": 2 } as CSSProperties}>
+                  <p className="text-[13px] text-white/50">In the room · pitch order</p>
+                  <ol className="mt-3 border-t border-white/12">
+                    {roster.map((c, i) => (
+                      <li
+                        key={c.slug}
+                        style={{ "--d": `${200 + i * 55}ms` } as CSSProperties}
+                        className="ledger-row grid grid-cols-[2rem_minmax(0,1fr)_auto] items-baseline gap-4 border-b border-white/12 py-[11px]"
+                      >
+                        <span className="font-display text-xs tabular-nums text-white/35">{String(pitchNumber(c.slug)).padStart(2, "0")}</span>
+                        <span className="truncate font-display text-[17px] font-semibold tracking-tight">{c.name}</span>
+                        <span className="max-w-[13rem] truncate text-right text-[13px] text-white/50 max-sm:hidden">{c.sector}</span>
+                      </li>
                     ))}
+                  </ol>
+                </div>
+              </div>
+            </section>
+
+            {/* ── NOTICE: three plain statements, not a card ── */}
+            <section className="border-t border-border">
+              <div className="mx-auto grid max-w-7xl gap-x-12 gap-y-8 px-4 py-16 sm:px-6 md:grid-cols-[1fr_1fr_1fr_1fr]">
+                <h2 className="font-display text-xl font-semibold tracking-tight text-navy">About this lounge</h2>
+                {[
+                  ["Attendees only", "Strictly private, open only to verified attendees of the Demo Day."],
+                  ["No contact details", "Names, organisations, roles and interests only. Emails and phone numbers are never shown."],
+                  ["Your card, your call", "Add or update your link inside the lounge, or ask us to take it down."],
+                ].map(([t, d]) => (
+                  <div key={t}>
+                    <h3 className="text-[15px] font-semibold text-navy">{t}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d}</p>
                   </div>
-                </div>
+                ))}
               </div>
             </section>
 
-            {/* ── NOTICE ── */}
-            <section className="mx-auto max-w-3xl py-10 sm:py-12">
-              <div className="relative flex gap-4 overflow-hidden rounded-2xl border border-primary/15 bg-card p-5 shadow-sm sm:gap-5 sm:p-6">
-                <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-                  <div className="absolute -right-8 -top-10 h-24 w-24 rounded-full bg-primary/10" />
-                  <svg className="absolute -bottom-6 -right-4 h-20 w-20 text-primary/25" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <defs>
-                      <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse">
-                        <path d="M0 6L6 0" />
-                      </pattern>
-                    </defs>
-                    <circle cx="40" cy="40" r="38" fill="url(#hatch)" stroke="none" />
-                  </svg>
-                  <DotGrid className="absolute -left-1 bottom-3 h-12 w-20 text-primary/25" />
-                </div>
-                <div className="relative hidden h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 sm:flex">
-                  <LockGlyph className="h-5 w-5 text-primary" />
-                </div>
-                <div className="relative min-w-0">
-                  <h2 className="text-sm font-bold text-navy">{"<Networking Lounge Notice>"}</h2>
-                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                    To facilitate professional networking during the {EVENT_NAME},
-                    this directory displays the name, organisation, designation and primary business
-                    interests of registered attendees.
-                  </p>
-                  <dl className="mt-3 space-y-2 text-xs leading-relaxed">
-                    <div>
-                      <dt className="inline font-semibold text-navy">Exclusive access. </dt>
-                      <dd className="inline text-muted-foreground">
-                        This directory is strictly private and accessible only to verified attendees
-                        present at the event.
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="inline font-semibold text-navy">No direct contact info. </dt>
-                      <dd className="inline text-muted-foreground">
-                        Personal contact information such as email addresses and phone numbers is not
-                        displayed or shared.
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="inline font-semibold text-navy">Data management. </dt>
-                      <dd className="inline text-muted-foreground">
-                        To update your details or opt out of being listed, use “Add or update my
-                        link” inside the lounge, or contact the organising team at{" "}
-                        <a href="mailto:support@lodestart.ai" className="font-medium text-primary hover:underline">
-                          support@lodestart.ai
-                        </a>
-                        .
-                      </dd>
-                    </div>
-                  </dl>
-                </div>
-              </div>
-            </section>
-
-            {/* ── FOOTER ── */}
-            <footer className="relative -mx-4 -mb-16 overflow-hidden bg-navy px-4 py-8 sm:-mx-6 sm:px-6">
-              <div className="relative mx-auto flex max-w-6xl flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+            <footer className="border-t border-border">
+              <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:px-6">
                 <Wordmark light />
-                <div>
-                  <div className="text-sm font-bold text-white">Global Demo Day</div>
-                  <div className="mt-1 text-xs text-white/70">Wed 28 Oct 2026 · Singapore</div>
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-white">Contact</div>
-                  <a
-                    href="mailto:support@lodestart.ai"
-                    className="mt-1 block text-xs text-yellow hover:underline"
-                  >
-                    support@lodestart.ai
-                  </a>
-                </div>
+                <span>Global Demo Day · Wed 28 Oct 2026 · Singapore</span>
+                <a href="mailto:support@lodestart.ai" className="text-yellow hover:underline">support@lodestart.ai</a>
               </div>
             </footer>
           </>
         ) : (
-          <div className="lg:grid lg:grid-cols-[248px_1fr] lg:gap-8">
-            {/* ── side rail ─────────────────────────────── */}
-            <aside className="lg:sticky lg:top-24 lg:self-start">
-              <div className="hidden lg:block">
-                <h1 className="font-display text-2xl font-bold tracking-tight text-navy">Attendees</h1>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  {profiles.length} people joined on 28 October.
-                </p>
+          <div className="mx-auto max-w-7xl px-4 pb-24 pt-10 sm:px-6 sm:pt-14">
+            {/* ── title + views ── */}
+            <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
+              <div>
+                <p className="text-[13px] font-semibold text-yellow">Virtual Networking Lounge</p>
+                <h1 className="mt-2 font-display text-[clamp(36px,4.6vw,60px)] font-bold leading-none tracking-[-0.03em] text-navy">
+                  {viewTitle}{" "}
+                  <span className="font-light tabular-nums text-navy/30">
+                    {view === "all" ? profiles.length : view === "mine" ? wallet?.length ?? "" : teamEntries?.length ?? ""}
+                  </span>
+                </h1>
               </div>
-
-              <div className="relative mt-4 lg:mt-5">
-                <svg
-                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="M20 20l-3.5-3.5" />
-                </svg>
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search name, company, role"
-                  className="w-full rounded-full border border-input bg-background py-2.5 pl-9 pr-3 text-base outline-none ring-primary/30 transition focus:ring-2 sm:text-sm"
-                />
-              </div>
-
-              {/* who's here — counts double as filters */}
-              <div className="mt-4 hidden rounded-2xl border border-border bg-card p-4 shadow-sm lg:block">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                  Who's here
-                </div>
-                <div className="mt-3 space-y-2.5">
-                  {groups.map(([label, n]) => {
-                    const active = interest === label;
-                    return (
-                      <button
-                        key={label}
-                        type="button"
-                        onClick={() => setInterest(active ? null : label)}
-                        className="group w-full text-left"
-                      >
-                        <div className="flex items-baseline justify-between gap-2">
-                          <span
-                            className={`truncate text-xs transition ${
-                              active ? "font-semibold text-navy" : "text-navy/70 group-hover:text-navy"
-                            }`}
-                          >
-                            {label}
-                          </span>
-                          <span className={`text-xs tabular-nums ${active ? "font-semibold text-navy" : "text-muted-foreground"}`}>
-                            {n}
-                          </span>
-                        </div>
-                        <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-secondary">
-                          <div
-                            className={`h-full rounded-full transition-all ${BAR_COLORS[label] ?? "bg-slate-400"} ${
-                              active ? "opacity-100" : "opacity-60 group-hover:opacity-90"
-                            }`}
-                            style={{ width: `${Math.round((n / profiles.length) * 100)}%` }}
-                          />
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <label className="mt-4 flex cursor-pointer items-center gap-2 border-t border-border pt-3 text-xs text-navy/70">
-                  <input
-                    type="checkbox"
-                    checked={linkedOnly}
-                    onChange={(e) => setLinkedOnly(e.target.checked)}
-                    className="h-3.5 w-3.5 accent-[color:var(--primary)]"
-                  />
-                  <span>Has a contact link ({linkedCount})</span>
-                </label>
-
-                {filtersOn && (
-                  <button
-                    type="button"
-                    onClick={clearFilters}
-                    className="mt-3 text-[11px] font-semibold text-primary hover:underline"
-                  >
-                    Clear filters
-                  </button>
-                )}
-              </div>
-
-              {/* mobile: horizontal filter chips */}
-              <div className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 lg:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {groups.map(([label, n]) => {
-                  const active = interest === label;
-                  return (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => setInterest(active ? null : label)}
-                      className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition ${
-                        active
-                          ? "bg-navy text-white ring-navy"
-                          : "bg-card text-navy/70 ring-border"
-                      }`}
-                    >
-                      {label} <span className="tabular-nums opacity-70">{n}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setShowContactForm((v) => !v);
-                  if (grantedEmail && !cEmail) setCEmail(grantedEmail);
-                }}
-                className="mt-4 w-full rounded-full border border-primary/40 bg-card px-4 py-2.5 text-xs font-semibold text-primary transition hover:bg-primary/10"
-              >
-                {showContactForm ? "Close" : "Add or update my link"}
-              </button>
-
-              {showContactForm && (
-                <div className="mt-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
-                  <p className="text-[11px] leading-relaxed text-muted-foreground">
-                    Add a LinkedIn profile, company page or open-chat link so others can reach you.
-                    No re-registration needed.
-                  </p>
-                  <input
-                    type="email"
-                    value={cEmail}
-                    onChange={(e) => setCEmail(e.target.value)}
-                    placeholder="Email you RSVP'd with"
-                    className="mt-3 w-full rounded-lg border border-input px-3 py-2.5 text-base sm:text-sm"
-                  />
-                  <input
-                    value={cUrl}
-                    onChange={(e) => setCUrl(e.target.value)}
-                    placeholder="linkedin.com/in/yourname"
-                    className="mt-2 w-full rounded-lg border border-input px-3 py-2.5 text-base sm:text-sm"
-                  />
-                  <button
-                    type="button"
-                    disabled={cBusy || !cEmail.trim()}
-                    onClick={() => void submitContact()}
-                    className="mt-3 w-full rounded-full bg-primary py-2 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
-                  >
-                    <BusyLabel busy={cBusy} text="Saving…">Save</BusyLabel>
-                  </button>
-                  {cMsg && (
-                    <p className={`mt-2 text-[11px] ${cMsg.ok ? "text-green-700" : "text-red-600"}`}>{cMsg.text}</p>
-                  )}
-                </div>
-              )}
-            </aside>
-
-            {/* ── card wall ─────────────────────────────── */}
-            <section className="mt-6 lg:mt-0">
               {grantedEmail && (
-                <div className="mb-4 inline-flex rounded-full border border-border bg-card p-1 shadow-sm">
-                  <button
-                    type="button"
-                    onClick={() => setView("all")}
-                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-                      view === "all" ? "bg-navy text-white" : "text-navy hover:bg-muted"
-                    }`}
-                  >
-                    Everyone
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setView("mine");
-                      if (grantedEmail) void refreshWallet(grantedEmail);
-                    }}
-                    className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-                      view === "mine" ? "bg-navy text-white" : "text-navy hover:bg-muted"
-                    }`}
-                  >
-                    My Contacts{wallet?.length ? ` (${wallet.length})` : ""}
-                  </button>
-                  {isTeam && (
+                <nav className="flex gap-6 border-b border-border" aria-label="Lounge views">
+                  {(
+                    [
+                      ["all", "Everyone"],
+                      ["mine", `My Contacts${wallet?.length ? ` · ${wallet.length}` : ""}`],
+                      ...(isTeam ? [["team", "Team view"]] : []),
+                    ] as [typeof view, string][]
+                  ).map(([v, label]) => (
                     <button
+                      key={v}
                       type="button"
+                      aria-current={view === v ? "page" : undefined}
                       onClick={() => {
-                        setView("team");
-                        if (grantedEmail) void refreshTeam(grantedEmail);
+                        setView(v);
+                        if (v === "mine" && grantedEmail) void refreshWallet(grantedEmail);
+                        if (v === "team" && grantedEmail) void refreshTeam(grantedEmail);
                       }}
-                      className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
-                        view === "team" ? "bg-navy text-white" : "text-navy hover:bg-muted"
+                      className={`-mb-px border-b-2 pb-3 text-sm font-semibold transition ${
+                        view === v ? "border-yellow text-navy" : "border-transparent text-muted-foreground hover:text-navy"
                       }`}
                     >
-                      Team view
+                      {label}
                     </button>
-                  )}
-                </div>
+                  ))}
+                </nav>
               )}
+            </div>
 
-              {view === "team" && isTeam ? (
-                <TeamContactsWall entries={teamEntries} />
-              ) : view === "mine" && grantedEmail ? (
+            {view === "team" && isTeam ? (
+              <div className="mt-10"><TeamContactsWall entries={teamEntries} /></div>
+            ) : view === "mine" && grantedEmail ? (
+              <div className="mt-10">
                 <MyContactsWall
                   wallet={wallet}
                   ownerEmail={grantedEmail}
@@ -667,182 +418,203 @@ function LoungePage() {
                   onAddCustom={() => setCustomEditor("new")}
                   onBrowseAll={() => setView("all")}
                 />
-              ) : (
-                <>
-              <div className="flex items-baseline justify-between gap-3">
-                <h2 className="font-display text-xl font-bold text-navy lg:hidden">Attendees</h2>
-                <p className="text-xs text-muted-foreground">
-                  {filtersOn ? `${shown.length} of ${profiles.length}` : `${profiles.length} people`}
-                  {interest && <> · {interest}</>}
-                </p>
-                {filtersOn && (
-                  <button
-                    type="button"
-                    onClick={clearFilters}
-                    className="text-[11px] font-semibold text-primary hover:underline lg:hidden"
-                  >
-                    Clear
-                  </button>
-                )}
               </div>
+            ) : (
+              <>
+                {/* ── who's here: one stacked bar, segments double as filters ── */}
+                <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-end">
+                  <div>
+                    <div className="flex h-2 w-full overflow-hidden rounded-full bg-secondary" role="group" aria-label="Filter by interest">
+                      {groups.map(([label, n]) => (
+                        <button
+                          key={label}
+                          type="button"
+                          title={`${label} · ${n}`}
+                          onClick={() => setInterest(interest === label ? null : label)}
+                          className="h-full transition-opacity first:rounded-l-full last:rounded-r-full"
+                          style={{ width: `${(n / profiles.length) * 100}%`, background: hueOf(label), opacity: interest && interest !== label ? 0.25 : 1 }}
+                        />
+                      ))}
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+                      {groups.map(([label, n]) => (
+                        <button
+                          key={label}
+                          type="button"
+                          aria-pressed={interest === label}
+                          onClick={() => setInterest(interest === label ? null : label)}
+                          className={`inline-flex items-center gap-2 text-[13px] transition ${
+                            interest && interest !== label ? "text-muted-foreground/60" : "text-navy"
+                          } hover:text-navy`}
+                        >
+                          <i className="h-2 w-2 rounded-full" style={{ background: hueOf(label) }} />
+                          {label}
+                          <span className="tabular-nums text-muted-foreground">{n}</span>
+                        </button>
+                      ))}
+                      <label className="inline-flex cursor-pointer items-center gap-2 text-[13px] text-muted-foreground hover:text-navy">
+                        <input type="checkbox" checked={linkedOnly} onChange={(e) => setLinkedOnly(e.target.checked)} className="h-3.5 w-3.5 accent-[color:var(--yellow)]" />
+                        Has a link <span className="tabular-nums">{linkedCount}</span>
+                      </label>
+                      {filtersOn && (
+                        <button type="button" onClick={clearFilters} className="text-[13px] font-semibold text-yellow hover:underline">
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 border-b border-border pb-2 transition-colors focus-within:border-yellow">
+                    <svg className="h-4 w-4 shrink-0 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                      <circle cx="11" cy="11" r="7" />
+                      <path d="M20 20l-3.5-3.5" />
+                    </svg>
+                    <input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Search name, company, role"
+                      aria-label="Search attendees"
+                      className="min-w-0 flex-1 bg-transparent py-1.5 text-base text-navy outline-none placeholder:text-muted-foreground sm:text-[15px]"
+                    />
+                  </div>
+                </div>
 
-              {shown.length === 0 ? (
-                <div className="mt-4 rounded-2xl border border-dashed border-border bg-card/60 p-10 text-center">
-                  <p className="text-sm font-semibold text-navy">No one matches that</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Try a different name or company, or clear the filters.
+                {/* ── ledger ── */}
+                {shown.length === 0 ? (
+                  <div className="mt-10 border-y border-border py-16 text-center">
+                    <p className="font-display text-lg font-semibold text-navy">No one matches that</p>
+                    <p className="mt-1 text-sm text-muted-foreground">Try another name or company, or clear the filters.</p>
+                    <button type="button" onClick={clearFilters} className="mt-5 text-sm font-semibold text-yellow hover:underline">
+                      Clear filters
+                    </button>
+                  </div>
+                ) : (
+                  <ul className="mt-8 border-t border-border">
+                    {shown.map((p, i) => (
+                      <li key={p.id} className="ledger-row" style={{ "--d": `${Math.min(i, 16) * 28}ms` } as CSSProperties}>
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => setSelected(p)}
+                          onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setSelected(p))}
+                          className="group grid cursor-pointer grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 border-b border-border px-1 py-4 outline-none transition hover:bg-white/[0.03] focus-visible:bg-white/[0.05] md:grid-cols-[44px_minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.85fr)_7.5rem] md:gap-x-6"
+                        >
+                          <span
+                            className="row-span-2 flex h-10 w-10 items-center justify-center rounded-full font-display text-[13px] font-semibold text-navy md:row-span-1 md:h-11 md:w-11"
+                            style={{ background: `color-mix(in srgb, ${hueOf(p.primary_interest)} 16%, transparent)`, boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${hueOf(p.primary_interest)} 45%, transparent)` }}
+                          >
+                            {initials(p.full_name)}
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block truncate text-[16px] font-semibold text-navy transition-colors group-hover:text-yellow">{p.full_name}</span>
+                            <span className="block truncate text-[13px] text-muted-foreground">{p.job_title}</span>
+                          </span>
+                          <span className="col-start-2 truncate text-[14px] text-navy/80 md:col-start-auto">{p.organisation}</span>
+                          <span className="hidden items-center gap-2 text-[13px] text-muted-foreground md:inline-flex">
+                            <i className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: hueOf(p.primary_interest) }} />
+                            <span className="truncate">{p.primary_interest || "General interest"}</span>
+                          </span>
+                          <span className="col-start-3 row-span-2 row-start-1 flex justify-end md:col-start-auto md:row-span-1 md:row-start-auto">
+                            {p.contact_url ? (
+                              <a
+                                href={absUrl(p.contact_url)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-[12px] font-semibold text-navy transition hover:border-yellow hover:text-yellow"
+                              >
+                                {contactLabel(p.contact_url)} <span aria-hidden>↗</span>
+                              </a>
+                            ) : (
+                              <span aria-hidden className="text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-yellow">→</span>
+                            )}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {/* ── my card ── */}
+                <div className="mt-12 grid gap-6 border-t border-border pt-8 md:grid-cols-[1fr_auto] md:items-start">
+                  <p className="max-w-xl text-[13px] leading-relaxed text-muted-foreground">
+                    Visible to event attendees only. Emails are shared only between confirmed 1:1 meeting partners, inside
+                    My Contacts. To update or remove your card, contact{" "}
+                    <a href="mailto:support@lodestart.ai" className="text-yellow hover:underline">support@lodestart.ai</a>.
                   </p>
                   <button
                     type="button"
-                    onClick={clearFilters}
-                    className="mt-4 rounded-full border border-border px-4 py-2 text-xs font-semibold text-navy transition hover:bg-muted"
+                    onClick={() => {
+                      setShowContactForm((v) => !v);
+                      if (grantedEmail && !cEmail) setCEmail(grantedEmail);
+                    }}
+                    className="inline-flex items-center gap-2 justify-self-start rounded-full border border-border px-4 py-2.5 text-[13px] font-semibold text-navy transition hover:border-yellow hover:text-yellow"
                   >
-                    Clear filters
+                    <LinkIcon className="h-3.5 w-3.5" />
+                    {showContactForm ? "Close" : "Add or update my link"}
                   </button>
-                </div>
-              ) : (
-                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
-                  {shown.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => setSelected(p)}
-                      className="group flex flex-col rounded-2xl border border-border bg-card p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:p-5"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white ring-2 ring-white"
-                          style={{ backgroundColor: avatarColor(p.full_name) }}
-                        >
-                          {initials(p.full_name)}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="truncate text-sm font-bold text-navy">{p.full_name}</div>
-                          <div className="line-clamp-2 break-words text-xs leading-snug text-muted-foreground">
-                            {p.job_title}
-                          </div>
-                          <div className="mt-0.5 truncate text-xs font-medium text-navy/60">
-                            {p.organisation}
-                          </div>
-                        </div>
+                  {showContactForm && (
+                    <div className="rounded-2xl border border-border bg-card p-5 md:col-span-2 md:max-w-lg">
+                      <p className="text-[13px] leading-relaxed text-muted-foreground">
+                        Add a LinkedIn profile, company page or open-chat link so others can reach you. No re-registration needed.
+                      </p>
+                      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                        <input type="email" value={cEmail} onChange={(e) => setCEmail(e.target.value)} placeholder="Email you RSVP'd with" className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-base sm:text-sm" />
+                        <input value={cUrl} onChange={(e) => setCUrl(e.target.value)} placeholder="linkedin.com/in/yourname" className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-base sm:text-sm" />
                       </div>
-                      <div className="mt-3 flex flex-1 items-end justify-between gap-2">
-                        {p.primary_interest ? (
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ring-1 ring-inset ${
-                              CHIP_COLORS[p.primary_interest] ?? "bg-secondary text-navy ring-border"
-                            }`}
-                          >
-                            {p.primary_interest}
-                          </span>
-                        ) : (
-                          <span />
-                        )}
-                        {p.contact_url ? (
-                          <a
-                            href={absUrl(p.contact_url)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-navy px-3 py-1.5 text-[11px] font-semibold text-white transition hover:bg-navy/85"
-                          >
-                            <LinkIcon className="h-3 w-3" />
-                            {contactLabel(p.contact_url)}
-                          </a>
-                        ) : (
-                          <span className="shrink-0 text-[10px] text-muted-foreground opacity-0 transition group-hover:opacity-100">
-                            View →
-                          </span>
-                        )}
+                      <div className="mt-3 flex items-center gap-3">
+                        <button type="button" disabled={cBusy || !cEmail.trim()} onClick={() => void submitContact()} className="rounded-full bg-yellow px-5 py-2 text-[13px] font-semibold text-yellow-foreground transition hover:brightness-110 disabled:opacity-50">
+                          <BusyLabel busy={cBusy} text="Saving…">Save</BusyLabel>
+                        </button>
+                        {cMsg && <p className={`text-[13px] ${cMsg.ok ? "text-emerald-300" : "text-rose-300"}`}>{cMsg.text}</p>}
                       </div>
-                    </button>
-                  ))}
+                    </div>
+                  )}
                 </div>
-              )}
+              </>
+            )}
 
-              <p className="mt-8 text-center text-[11px] leading-relaxed text-muted-foreground">
-                Visible to event attendees only · emails are shared only between confirmed 1:1
-                meeting partners inside My Contacts · to update or remove your card, contact{" "}
-                <a href="mailto:support@lodestart.ai" className="font-medium text-primary hover:underline">
-                  support@lodestart.ai
-                </a>
-              </p>
-                </>
-              )}
-            </section>
+            <footer className="mt-16 text-center text-xs text-muted-foreground">{CREDITS}</footer>
           </div>
         )}
 
         {selected && (
-          <div
-            className="fixed inset-0 z-50 flex items-end justify-center bg-navy/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
-            onClick={() => setSelected(null)}
-          >
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-4" onClick={() => setSelected(null)}>
             <div
-              className="max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-t-2xl bg-card shadow-xl sm:rounded-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-label={selected.full_name}
+              className="sheet-rise relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-t-[28px] border border-border bg-card shadow-2xl sm:rounded-[28px]"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative bg-secondary/60 px-6 pb-6 pt-8 text-center">
-                <button
-                  type="button"
-                  onClick={() => setSelected(null)}
-                  aria-label="Close"
-                  className="absolute right-3 top-3 rounded-full p-1.5 text-muted-foreground transition hover:bg-background hover:text-navy"
-                >
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M6 6l12 12M18 6L6 18" />
-                  </svg>
+              <div className="relative isolate overflow-hidden px-7 pb-7 pt-10">
+                <img src={sphereArt} alt="" aria-hidden className="pointer-events-none absolute -right-16 -top-20 -z-10 w-56 opacity-50" />
+                <button type="button" onClick={() => setSelected(null)} aria-label="Close" className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground transition hover:text-navy">
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M18 6L6 18" /></svg>
                 </button>
-                <div
-                  className="mx-auto flex h-20 w-20 items-center justify-center rounded-full text-xl font-bold text-white ring-4 ring-background"
-                  style={{ backgroundColor: avatarColor(selected.full_name) }}
+                <span
+                  className="flex h-16 w-16 items-center justify-center rounded-full font-display text-lg font-semibold text-navy"
+                  style={{ background: `color-mix(in srgb, ${hueOf(selected.primary_interest)} 18%, transparent)`, boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${hueOf(selected.primary_interest)} 50%, transparent)` }}
                 >
                   {initials(selected.full_name)}
-                </div>
-                <div className="mt-3 text-lg font-bold text-navy">{selected.full_name}</div>
-                {selected.primary_interest && (
-                  <span
-                    className={`mt-2 inline-block rounded-full px-3 py-1 text-[11px] font-semibold ring-1 ring-inset ${
-                      CHIP_COLORS[selected.primary_interest] ?? "bg-background text-navy ring-border"
-                    }`}
-                  >
-                    {selected.primary_interest}
-                  </span>
-                )}
+                </span>
+                <h2 className="mt-5 font-display text-[28px] font-bold leading-tight tracking-tight text-navy">{selected.full_name}</h2>
+                <p className="mt-1 text-[15px] text-muted-foreground">{selected.job_title}</p>
+                <p className="mt-0.5 text-[15px] text-navy/85">{selected.organisation}</p>
+                <p className="mt-4 inline-flex items-center gap-2 text-[13px] text-navy">
+                  <i className="h-2 w-2 rounded-full" style={{ background: hueOf(selected.primary_interest) }} />
+                  {selected.primary_interest || "General interest"}
+                </p>
               </div>
-              <div className="space-y-3 px-6 py-5">
-                <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Organisation
-                  </div>
-                  <div className="mt-0.5 break-words text-sm font-semibold text-navy">{selected.organisation}</div>
-                </div>
-                <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Role</div>
-                  <div className="mt-0.5 break-words text-sm text-navy/90">{selected.job_title}</div>
-                </div>
+              <div className="grid gap-2 border-t border-border px-7 py-5">
                 {selected.contact_url ? (
-                  <a
-                    href={absUrl(selected.contact_url)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-navy py-2.5 text-sm font-semibold text-white transition hover:bg-navy/85"
-                  >
-                    <LinkIcon className="h-4 w-4" />
-                    Connect on {contactLabel(selected.contact_url)}
+                  <a href={absUrl(selected.contact_url)} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-full bg-yellow py-3 text-sm font-semibold text-yellow-foreground transition hover:brightness-110">
+                    <LinkIcon className="h-4 w-4" /> Connect on {contactLabel(selected.contact_url)}
                   </a>
                 ) : (
-                  <p className="mt-2 rounded-lg bg-secondary/60 px-3 py-2 text-center text-xs text-muted-foreground">
-                    No contact link added yet
-                  </p>
+                  <p className="py-2 text-center text-[13px] text-muted-foreground">No contact link added yet</p>
                 )}
                 {grantedEmail && (
-                  <button
-                    type="button"
-                    disabled={addedIds.has(selected.id)}
-                    onClick={() => setAddTarget(selected)}
-                    className="mt-1 flex w-full items-center justify-center gap-2 rounded-full border border-border py-2.5 text-sm font-semibold text-navy transition hover:bg-muted disabled:opacity-60"
-                  >
+                  <button type="button" disabled={addedIds.has(selected.id)} onClick={() => setAddTarget(selected)} className="rounded-full border border-border py-3 text-sm font-semibold text-navy transition hover:border-yellow hover:text-yellow disabled:opacity-60 disabled:hover:border-border disabled:hover:text-navy">
                     {addedIds.has(selected.id) ? "✓ In My Contacts" : "＋ Add to My Contacts"}
                   </button>
                 )}
@@ -893,11 +665,6 @@ function LoungePage() {
           />
         )}
 
-        {profiles && (
-          <footer className="mt-10 text-center text-xs text-muted-foreground">
-            {CREDITS}
-          </footer>
-        )}
       </main>
     </div>
   );
@@ -986,8 +753,8 @@ function MyContactsWall({
             onClick={() => (selecting ? exitSelect() : setSelecting(true))}
             className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold shadow-sm transition ${
               selecting
-                ? "bg-navy text-white hover:bg-navy/85"
-                : "bg-navy text-white hover:bg-navy/85"
+                ? "bg-yellow text-yellow-foreground hover:brightness-110"
+                : "bg-yellow text-yellow-foreground hover:brightness-110"
             }`}
           >
             {selecting ? (
@@ -1039,7 +806,7 @@ function MyContactsWall({
             )}
             <div className="flex items-start gap-3">
               <div
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white ring-2 ring-white"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white ring-1 ring-white/15"
                 style={{ backgroundColor: avatarColor(w.full_name) }}
               >
                 {initials(w.full_name)}
@@ -1055,7 +822,7 @@ function MyContactsWall({
             )}
             <div className="mt-3 flex flex-1 items-end justify-between gap-2">
               {w.source === "meeting" ? (
-                <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+                <span className="rounded-full bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-300 ring-1 ring-inset ring-emerald-300/25">
                   1:1 meeting
                 </span>
               ) : w.rsvp_id ? (
@@ -1063,7 +830,7 @@ function MyContactsWall({
                   Saved
                 </span>
               ) : (
-                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-semibold text-amber-700 ring-1 ring-inset ring-amber-600/20">
+                <span className="rounded-full bg-amber-400/10 px-2.5 py-1 text-[10px] font-semibold text-amber-300 ring-1 ring-inset ring-amber-300/25">
                   External
                 </span>
               )}
@@ -1140,7 +907,7 @@ function BulkEmailBar({
   return (
     <>
       {opening && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-navy/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="flex items-center gap-3 rounded-2xl bg-card px-6 py-4 shadow-xl">
             <svg className="h-5 w-5 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -1155,7 +922,7 @@ function BulkEmailBar({
           </div>
         </div>
       )}
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 p-3 shadow-[0_-8px_24px_rgba(10,33,99,0.08)] backdrop-blur sm:p-4">
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 p-3 shadow-[0_-12px_32px_rgba(0,0,0,0.4)] backdrop-blur sm:p-4">
       <div className="mx-auto flex max-w-3xl flex-col gap-2.5">
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs text-navy">
@@ -1252,7 +1019,7 @@ function WalletCardModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-navy/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
@@ -1281,7 +1048,7 @@ function WalletCardModal({
             {entry.job_title} · {entry.organisation}
           </div>
           {entry.source === "meeting" && (
-            <span className="mt-2 inline-block rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
+            <span className="mt-2 inline-block rounded-full bg-emerald-400/10 px-3 py-1 text-[11px] font-semibold text-emerald-300 ring-1 ring-inset ring-emerald-300/25">
               Met in a 1:1 meeting
             </span>
           )}
@@ -1306,7 +1073,7 @@ function WalletCardModal({
               href={absUrl(entry.contact_url)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-navy py-2.5 text-sm font-semibold text-white transition hover:bg-navy/85"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-yellow py-2.5 text-sm font-semibold text-yellow-foreground transition hover:brightness-110"
             >
               <LinkIcon className="h-4 w-4" />
               Connect on {contactLabel(entry.contact_url)}
@@ -1358,7 +1125,7 @@ function WalletCardModal({
               type="button"
               disabled={busy}
               onClick={() => void remove()}
-              className="w-full rounded-full border border-border py-2 text-xs font-semibold text-muted-foreground transition hover:bg-muted hover:text-rose-600"
+              className="w-full rounded-full border border-border py-2 text-xs font-semibold text-muted-foreground transition hover:bg-muted hover:text-rose-300"
             >
               <BusyLabel busy={removing} text="Removing…">Remove from My Contacts</BusyLabel>
             </button>
@@ -1391,7 +1158,7 @@ function AddContactPopup({
   };
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-navy/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onCancel}
     >
       <div
@@ -1505,7 +1272,7 @@ function CustomContactModal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-navy/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
@@ -1531,7 +1298,7 @@ function CustomContactModal({
             className={`${field} resize-none`}
           />
         </div>
-        {err && <p className="mt-2 text-[11px] text-rose-600">{err}</p>}
+        {err && <p className="mt-2 text-[11px] text-rose-300">{err}</p>}
         <div className="mt-4 flex gap-2">
           <button
             type="button"
@@ -1555,7 +1322,7 @@ function CustomContactModal({
             type="button"
             disabled={busy}
             onClick={() => void remove()}
-            className="mt-2 w-full rounded-full border border-border py-2 text-xs font-semibold text-muted-foreground transition hover:bg-muted hover:text-rose-600"
+            className="mt-2 w-full rounded-full border border-border py-2 text-xs font-semibold text-muted-foreground transition hover:bg-muted hover:text-rose-300"
           >
             <BusyLabel busy={removing} text="Removing…">Remove from My Contacts</BusyLabel>
           </button>
@@ -1594,7 +1361,7 @@ function TeamContactsWall({ entries }: { entries: TeamContactEntry[] | null }) {
           <div key={i} className="flex flex-col rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
             <div className="flex items-start gap-3">
               <div
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white ring-2 ring-white"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white ring-1 ring-white/15"
                 style={{ backgroundColor: avatarColor(e.full_name) }}
               >
                 {initials(e.full_name)}
@@ -1607,7 +1374,7 @@ function TeamContactsWall({ entries }: { entries: TeamContactEntry[] | null }) {
                 {e.organisation && <div className="mt-0.5 truncate text-xs font-medium text-navy/60">{e.organisation}</div>}
               </div>
               {e.is_external ? (
-                <span className="shrink-0 rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-semibold text-amber-700 ring-1 ring-inset ring-amber-600/20">
+                <span className="shrink-0 rounded-full bg-amber-400/10 px-2.5 py-1 text-[10px] font-semibold text-amber-300 ring-1 ring-inset ring-amber-300/25">
                   External
                 </span>
               ) : (

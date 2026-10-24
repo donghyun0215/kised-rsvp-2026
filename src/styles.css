@@ -356,3 +356,31 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-sphere, .core-orb, .facts-orb, .flow { animation: none; }
 }
+
+/* ── Networking lounge: night scope ──
+   The lounge runs on the home hero's night sky. Redefining the theme tokens
+   here re-skins every lounge component (wall, wallet, modals) at once. */
+.lounge-night {
+  --background: #0c1024;
+  --foreground: #eef1ff;
+  --card: #141a37;
+  --card-foreground: #eef1ff;
+  --popover: #141a37;
+  --navy: #eef1ff;
+  --muted: rgb(255 255 255 / 0.06);
+  --muted-foreground: rgb(206 214 245 / 0.6);
+  --secondary: rgb(255 255 255 / 0.06);
+  --secondary-foreground: #eef1ff;
+  --accent: rgb(255 255 255 / 0.08);
+  --border: rgb(150 168 255 / 0.15);
+  --input: rgb(150 168 255 / 0.28);
+  --primary: #7fd3f2;
+  --primary-foreground: #0e1226;
+  --ring: #7fd3f2;
+  color-scheme: dark;
+}
+.lounge-night input, .lounge-night textarea { color: var(--navy); }
+.lounge-night ::placeholder { color: rgb(206 214 245 / 0.35); }
+@keyframes sheet-rise { from { opacity: 0; transform: translateY(18px) scale(0.985); } to { opacity: 1; transform: none; } }
+.sheet-rise { animation: sheet-rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) { .sheet-rise { animation: none; } }
