@@ -300,7 +300,7 @@ function LoungePage() {
                       />
                       <button
                         type="submit"
-                        disabled={!email.trim() || loading}
+                        disabled={loading}
                         className="group mb-2.5 inline-flex shrink-0 items-center gap-2 rounded-full bg-yellow px-5 py-2.5 text-sm font-semibold text-yellow-foreground transition hover:brightness-110 disabled:opacity-40"
                       >
                         <BusyLabel busy={loading} text="Checking…">
