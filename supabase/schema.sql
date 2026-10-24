@@ -132,7 +132,7 @@ alter table public.rsvps add column if not exists show_in_lounge boolean not nul
 -- on-site QR (key + email together — remote email-only entry never counts),
 -- or toggled manually from /admin. checked_in_via records which.
 alter table public.rsvps add column if not exists checked_in_at timestamptz;
-alter table public.rsvps add column if not exists checked_in_via text; -- 'qr' | 'manual'
+alter table public.rsvps add column if not exists checked_in_via text; -- 'qr' | 'lounge' | 'qr-name' | 'walk-in' | 'manual'
 
 -- Per-attendee saved contacts ("내 명함집"). 1:1 meeting partners are
 -- computed live from bookings and never stored here; this table holds only

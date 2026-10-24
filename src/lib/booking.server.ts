@@ -686,6 +686,139 @@ export const markLoungeCheckIn = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ── Self check-in by name (2026-10-24) ─────────────────────────────
+// The entrance QR (key) opens a name search instead of an email box, and
+// walk-ins register on the same screen. Picking a name records attendance
+// but never hands the email to the browser, so it only opens the public
+// wall; My Contacts still asks for the RSVP email. Outside the event window
+// the QR still opens the lounge, it just doesn't count anyone.
+// ponytail: hardcoded window, same as markLoungeCheckIn.
+const CHECKIN_FROM = Date.parse("2026-10-28T12:00:00+08:00");
+const CHECKIN_TO = Date.parse("2026-10-28T22:00:00+08:00");
+const loungeKeyOk = (k?: string) => Boolean(LOUNGE_ACCESS_KEY && k === LOUNGE_ACCESS_KEY);
+const checkInLive = () => Date.now() >= CHECKIN_FROM && Date.now() <= CHECKIN_TO;
+
+// Case, punctuation, word order and common romanisation variants don't matter.
+const foldName = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize("NFKC")
+    .replace(/[^a-z0-9\uac00-\ud7a3\s]/g, " ")
+    .replace(/eo/g, "u").replace(/oo/g, "u").replace(/ee/g, "i")
+    .replace(/rh/g, "r").replace(/\b(yi|ri)\b/g, "li")
+    .replace(/gw/g, "kw").replace(/ch/g, "j")
+    .replace(/\s+/g, " ")
+    .trim();
+const maskEmail = (e: string) => {
+  const [u = "", d = ""] = e.split("@");
+  return `${u.slice(0, 2)}${"•".repeat(Math.max(2, Math.min(u.length - 2, 5)))}@${d}`;
+};
+
+export interface CheckInMatch {
+  id: string;
+  full_name: string;
+  organisation: string;
+  hint: string; // masked email, only to tell two same names apart
+  checked_in: boolean;
+}
+
+export const findRsvpForCheckIn = createServerFn({ method: "POST" })
+  .validator((data: { key: string; q: string }) => data)
+  .handler(async ({ data }): Promise<{ ok: true; matches: CheckInMatch[] } | { ok: false }> => {
+    if (!loungeKeyOk(data.key)) return { ok: false };
+    const words = foldName(data.q ?? "").split(" ").filter(Boolean);
+    if (words.join("").length < 2) return { ok: true, matches: [] };
+    const { data: rows, error } = await supabaseAdmin
+      .from("rsvps")
+      .select("id, full_name, organisation, email, checked_in_at");
+    if (error) {
+      console.error("findRsvpForCheckIn error:", error);
+      return { ok: false };
+    }
+    const scored = (rows ?? [])
+      .map((r) => {
+        const name = foldName(String(r.full_name));
+        const hay = `${name} ${foldName(String(r.organisation))}`;
+        const hit = words.every((w) => hay.includes(w)) || hay.replace(/ /g, "").includes(words.join(""));
+        return { r, hit, score: name.startsWith(words[0]) ? 0 : name.includes(words[0]) ? 1 : 2 };
+      })
+      .filter((x) => x.hit)
+      .sort((a, b) => a.score - b.score || String(a.r.full_name).localeCompare(String(b.r.full_name)));
+    // Six at most, so the box can't be used to page through the guest list.
+    const matches = scored.slice(0, 6).map(({ r }) => ({
+      id: String(r.id),
+      full_name: String(r.full_name),
+      organisation: String(r.organisation),
+      hint: maskEmail(String(r.email)),
+      checked_in: Boolean(r.checked_in_at),
+    }));
+    return { ok: true, matches };
+  });
+
+export const checkInById = createServerFn({ method: "POST" })
+  .validator((data: { key: string; rsvpId: string }) => data)
+  .handler(async ({ data }): Promise<{ ok: boolean; recorded?: boolean }> => {
+    if (!loungeKeyOk(data.key) || !data.rsvpId) return { ok: false };
+    if (!checkInLive()) return { ok: true, recorded: false };
+    const { error } = await supabaseAdmin
+      .from("rsvps")
+      .update({ checked_in_at: new Date().toISOString(), checked_in_via: "qr-name" })
+      .eq("id", data.rsvpId)
+      .is("checked_in_at", null);
+    if (error) {
+      console.error("checkInById error:", error);
+      return { ok: false };
+    }
+    return { ok: true, recorded: true };
+  });
+
+// Walk-ins register from the same QR screen: a short RSVP that is checked in
+// on the spot. An email that already has an RSVP just checks that one in.
+export const walkInRsvp = createServerFn({ method: "POST" })
+  .validator(
+    (data: { key: string; fullName: string; organisation: string; jobTitle: string; email: string; primaryInterest?: string }) => data,
+  )
+  .handler(async ({ data }): Promise<{ ok: boolean; message?: string }> => {
+    if (!loungeKeyOk(data.key)) return { ok: false, message: "Scan the QR code at the entrance to register." };
+    const email = data.email?.toLowerCase().trim();
+    const fullName = data.fullName?.trim();
+    const organisation = data.organisation?.trim();
+    const jobTitle = data.jobTitle?.trim();
+    if (!fullName || !organisation || !jobTitle || !email || !/^\S+@\S+\.\S+$/.test(email)) {
+      return { ok: false, message: "Please fill in every field with a valid email." };
+    }
+    const live = checkInLive();
+    const now = new Date().toISOString();
+    const { data: existing } = await supabaseAdmin.from("rsvps").select("id").eq("email", email).maybeSingle();
+    if (existing) {
+      if (live) {
+        await supabaseAdmin
+          .from("rsvps")
+          .update({ checked_in_at: now, checked_in_via: "qr" })
+          .eq("id", existing.id)
+          .is("checked_in_at", null);
+      }
+      return { ok: true };
+    }
+    const { error } = await supabaseAdmin.from("rsvps").insert({
+      full_name: fullName,
+      organisation,
+      job_title: jobTitle,
+      email,
+      phone: "",
+      primary_interest: data.primaryInterest || "General interest",
+      notes: "Walk-in (registered from the entrance QR)",
+      attend_showcase: true,
+      checked_in_at: live ? now : null,
+      checked_in_via: live ? "walk-in" : null,
+    });
+    if (error) {
+      console.error("walkInRsvp error:", error);
+      return { ok: false, message: "Something went wrong. Please ask the desk." };
+    }
+    return { ok: true };
+  });
+
 // Manual override from /admin — staff can check people in (walk-ups whose
 // phone died) or undo a mistaken check-in.
 export const adminSetCheckedIn = createServerFn({ method: "POST" })

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Wordmark } from "@/components/Wordmark";
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { CheckInGate, type CheckedInAs } from "@/components/CheckInGate";
 import sphereArt from "@/assets/ci/sphere.webp";
 import horizonArt from "@/assets/ci/horizon.webp";
 import { CREDITS, EVENT_NAME, pitchNumber } from "@/data/timeslots";
@@ -105,6 +106,8 @@ function LockGlyph({ className }: { className?: string }) {
   );
 }
 
+const ME_KEY = "kised26.lounge.me";
+
 function LoungePage() {
   const { key } = Route.useSearch();
   const [email, setEmail] = useState("");
@@ -173,7 +176,6 @@ function LoungePage() {
         void markLoungeCheckIn({ data: { key: auth.key, email: auth.email } });
       }
     } else {
-      setProfiles(null);
       setGateError(
         auth.key
           ? "No RSVP found with this email — please RSVP first, then come back in."
@@ -182,8 +184,28 @@ function LoungePage() {
     }
   };
 
-  // A QR scan lands here holding a key, but we deliberately do not enter
-  // automatically — the visitor gets a beat to read the notice and tap in.
+  // QR (key) visitors check in by name; remembered on this phone so a
+  // second scan goes straight back in. Email entry stays for remote visits.
+  const [useEmailGate, setUseEmailGate] = useState(false);
+  const [checkedAs, setCheckedAs] = useState<CheckedInAs | null>(null);
+  const [unlockEmail, setUnlockEmail] = useState("");
+  const enterAs = (me: CheckedInAs, remember = true) => {
+    if (remember) {
+      try {
+        localStorage.setItem(ME_KEY, JSON.stringify(me));
+      } catch {}
+    }
+    setCheckedAs(me);
+    void load(me.email ? { key, email: me.email } : { key });
+  };
+  useEffect(() => {
+    if (!key) return;
+    try {
+      const raw = localStorage.getItem(ME_KEY);
+      if (raw) enterAs(JSON.parse(raw) as CheckedInAs, false);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
 
   const submitContact = async () => {
     if (!cEmail.trim() || cBusy) return;
@@ -279,6 +301,11 @@ function LoungePage() {
                     came for, save the ones you meet, and follow up after.
                   </p>
 
+                  {key && !useEmailGate ? (
+                    <div className="hero-in mt-12 max-w-md" style={{ "--i": 3 } as CSSProperties}>
+                      <CheckInGate loungeKey={key} onEnter={enterAs} onUseEmail={() => setUseEmailGate(true)} />
+                    </div>
+                  ) : (
                   <form
                     className="hero-in mt-12 max-w-md"
                     style={{ "--i": 3 } as CSSProperties}
@@ -319,6 +346,7 @@ function LoungePage() {
                       </p>
                     )}
                   </form>
+                  )}
                 </div>
 
                 <div className="hero-in self-end" style={{ "--i": 2 } as CSSProperties}>
@@ -370,7 +398,30 @@ function LoungePage() {
             {/* ── title + views ── */}
             <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
               <div>
-                <p className="text-[13px] font-semibold text-yellow">Virtual Networking Lounge</p>
+                <p className="text-[13px] font-semibold text-yellow">
+                  Virtual Networking Lounge
+                  {checkedAs && (
+                    <span className="ml-3 font-normal text-muted-foreground">
+                      {checkedAs.name}{" "}
+                      <button
+                        type="button"
+                        className="underline underline-offset-4 hover:text-navy"
+                        onClick={() => {
+                          try {
+                            localStorage.removeItem(ME_KEY);
+                          } catch {}
+                          setCheckedAs(null);
+                          setGrantedEmail(null);
+                          setWallet(null);
+                          setView("all");
+                          setProfiles(null);
+                        }}
+                      >
+                        Not you?
+                      </button>
+                    </span>
+                  )}
+                </p>
                 <h1 className="mt-2 font-display text-[clamp(36px,4.6vw,60px)] font-bold leading-none tracking-[-0.03em] text-navy">
                   {viewTitle}{" "}
                   <span className="font-light tabular-nums text-navy/30">
@@ -378,7 +429,7 @@ function LoungePage() {
                   </span>
                 </h1>
               </div>
-              {grantedEmail && (
+              {(
                 <nav className="flex gap-6 border-b border-border" aria-label="Lounge views">
                   {(
                     [
@@ -409,6 +460,34 @@ function LoungePage() {
 
             {view === "team" && isTeam ? (
               <div className="mt-10"><TeamContactsWall entries={teamEntries} /></div>
+            ) : view === "mine" && !grantedEmail ? (
+              <form
+                className="mt-10 max-w-lg rounded-2xl border border-border bg-card p-6"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (unlockEmail.trim()) void load({ key, email: unlockEmail.trim() });
+                }}
+              >
+                <h2 className="font-display text-lg font-semibold text-navy">Your contacts are private</h2>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                  Enter the email you RSVP'd with to see your 1:1 meeting partners and the people you save.
+                </p>
+                <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                  <input
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    value={unlockEmail}
+                    onChange={(e) => setUnlockEmail(e.target.value)}
+                    placeholder="you@company.com"
+                    className="min-w-0 flex-1 rounded-full border border-border bg-background px-4 py-2.5 text-base text-navy outline-none focus:border-yellow sm:text-sm"
+                  />
+                  <button type="submit" disabled={loading} className="rounded-full bg-yellow px-5 py-2.5 text-sm font-semibold text-yellow-foreground transition hover:brightness-110 disabled:opacity-50">
+                    <BusyLabel busy={loading} text="Checking…">Open my contacts</BusyLabel>
+                  </button>
+                </div>
+                {gateError && <p role="alert" className="mt-3 text-[13px] text-rose-300">{gateError}</p>}
+              </form>
             ) : view === "mine" && grantedEmail ? (
               <div className="mt-10">
                 <MyContactsWall

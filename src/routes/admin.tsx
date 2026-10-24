@@ -596,7 +596,8 @@ function eventStyle(type: BookingEvent["event_type"]) {
 // distinguishable in the DB.
 // Walk-in = RSVP created on event day from 14:00 SGT (registration opens 14:30)
 const WALK_IN_FROM = new Date("2026-10-28T14:00:00+08:00").getTime();
-const isWalkIn = (r: { created_at: string }) => new Date(r.created_at).getTime() >= WALK_IN_FROM;
+const isWalkIn = (r: { created_at: string; checked_in_via?: string | null }) =>
+  r.checked_in_via === "walk-in" || new Date(r.created_at).getTime() >= WALK_IN_FROM;
 
 function CheckInCell({ rsvp, password, onSaved }: { rsvp: AdminRsvp; password: string; onSaved: () => void | Promise<unknown> }) {
   const [busy, setBusy] = useState(false);
@@ -636,7 +637,7 @@ function CheckInCell({ rsvp, password, onSaved }: { rsvp: AdminRsvp; password: s
       ) : (
         <>
           {checked ? "✓ Here" : "—"}
-          {checked && (rsvp.checked_in_via === "qr" || rsvp.checked_in_via === "lounge") && <span className="text-[9px] font-normal">QR</span>}
+          {checked && ["qr", "lounge", "qr-name", "walk-in"].includes(rsvp.checked_in_via ?? "") && <span className="text-[9px] font-normal">QR</span>}
         </>
       )}
     </button>
