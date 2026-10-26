@@ -11,7 +11,7 @@ export const Route = createFileRoute("/api/invite")({
     handlers: {
       GET: async ({ request }) => {
         const url = new URL(request.url);
-        const mail = buildInvite(url.searchParams.get("from") === "support", url.searchParams.get("round") === "2" ? 2 : 1);
+        const mail = buildInvite(url.searchParams.get("from") === "support", url.searchParams.get("round") === "2" ? 2 : 1, url.searchParams.has("unsub"));
         if (url.searchParams.has("preview")) {
           const html = mail.html.replace("{{GREETING}}", "Dear Guest,");
           return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
