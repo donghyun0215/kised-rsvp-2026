@@ -529,6 +529,15 @@ export const lookupRsvpByEmail = createServerFn({ method: "POST" })
 // only see what a name badge already shows.
 
 const LOUNGE_ACCESS_KEY = process.env.LOUNGE_ACCESS_KEY; // no fallback on purpose
+// The entrance QR (printed for 28 Oct) carries its own key. Only its SHA-256
+// lives here (public repo), so it works without touching Vercel env.
+const ENTRANCE_KEY_SHA256 = "8070362f387c2eda24739d9299e90d1b0526bfcee8b687e989652191d915d0e6";
+async function keyOk(k?: string): Promise<boolean> {
+  if (!k) return false;
+  if (LOUNGE_ACCESS_KEY && k === LOUNGE_ACCESS_KEY) return true;
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(k));
+  return Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, "0")).join("") === ENTRANCE_KEY_SHA256;
+}
 
 // Addresses/domains ("@x.com") that may RSVP but are kept out of the lounge.
 const LOUNGE_BLOCKED: string[] = [];
@@ -551,7 +560,7 @@ export const listLoungeProfiles = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: true; profiles: LoungeProfile[] } | { ok: false }> => {
     let authorised = false;
     if (isLoungeBlocked(data.email)) return { ok: false };
-    if (data.key && LOUNGE_ACCESS_KEY && data.key === LOUNGE_ACCESS_KEY) {
+    if (await keyOk(data.key)) {
       authorised = true;
     } else if (data.email) {
       const email = data.email.toLowerCase().trim();
@@ -668,15 +677,15 @@ export const markLoungeCheckIn = createServerFn({ method: "POST" })
     // CMK lesson: badge QR check-ins weren't always landing, so during
     // Demo Day hours any lounge entry with a registered email counts as
     // attendance. ponytail: hardcoded window; make it an admin setting next event.
-    const keyOk = Boolean(LOUNGE_ACCESS_KEY && data.key === LOUNGE_ACCESS_KEY);
+    const keyValid = await keyOk(data.key);
     const now = Date.now();
     const eventLive = now >= Date.parse("2026-10-28T12:00:00+08:00") && now <= Date.parse("2026-10-28T22:00:00+08:00");
-    if (!keyOk && !eventLive) return { ok: false };
+    if (!keyValid && !eventLive) return { ok: false };
     const email = data.email?.toLowerCase().trim();
     if (!email) return { ok: false };
     const { error } = await supabaseAdmin
       .from("rsvps")
-      .update({ checked_in_at: new Date().toISOString(), checked_in_via: keyOk ? "qr" : "lounge" })
+      .update({ checked_in_at: new Date().toISOString(), checked_in_via: keyValid ? "qr" : "lounge" })
       .eq("email", email)
       .is("checked_in_at", null);
     if (error) {
@@ -695,7 +704,7 @@ export const markLoungeCheckIn = createServerFn({ method: "POST" })
 // ponytail: hardcoded window, same as markLoungeCheckIn.
 const CHECKIN_FROM = Date.parse("2026-10-28T12:00:00+08:00");
 const CHECKIN_TO = Date.parse("2026-10-28T22:00:00+08:00");
-const loungeKeyOk = (k?: string) => Boolean(LOUNGE_ACCESS_KEY && k === LOUNGE_ACCESS_KEY);
+const loungeKeyOk = (k?: string) => keyOk(k);
 const checkInLive = () => Date.now() >= CHECKIN_FROM && Date.now() <= CHECKIN_TO;
 
 // Case, punctuation, word order and common romanisation variants don't matter.
@@ -703,12 +712,65 @@ const foldName = (s: string) =>
   s
     .toLowerCase()
     .normalize("NFKC")
-    .replace(/[^a-z0-9\uac00-\ud7a3\s]/g, " ")
-    .replace(/eo/g, "u").replace(/oo/g, "u").replace(/ee/g, "i")
+    .replace(/[^a-z0-9가-힣\s]/g, " ")
+    .replace(/eo/g, "u").replace(/oo/g, "u").replace(/ee/g, "i").replace(/ou/g, "u")
     .replace(/rh/g, "r").replace(/\b(yi|ri)\b/g, "li")
-    .replace(/gw/g, "kw").replace(/ch/g, "j")
+    .replace(/gw/g, "kw").replace(/ch/g, "j").replace(/sh/g, "s")
+    // k/g, t/d, p/b are spelled either way in Korean names (Kim/Gim, Dae/Tae)
+    .replace(/k/g, "g").replace(/t/g, "d").replace(/p/g, "b")
+    .replace(/\bwu/g, "u")
     .replace(/\s+/g, " ")
     .trim();
+
+// Hangul → Revised Romanisation, syllable by syllable, so "김동현" finds
+// "DongHyun Kim" and an English query finds a name typed in Korean.
+const RR_L = ["g", "kk", "n", "d", "tt", "r", "m", "b", "pp", "s", "ss", "", "j", "jj", "ch", "k", "t", "p", "h"];
+const RR_V = ["a", "ae", "ya", "yae", "eo", "e", "yeo", "ye", "o", "wa", "wae", "oe", "yo", "u", "wo", "we", "wi", "yu", "eu", "ui", "i"];
+const RR_T = ["", "k", "k", "k", "n", "n", "n", "t", "l", "k", "m", "l", "l", "l", "p", "l", "m", "p", "p", "t", "t", "ng", "t", "t", "k", "t", "p", "t"];
+const romanise = (s: string) =>
+  Array.from(s, (ch) => {
+    const c = ch.charCodeAt(0) - 0xac00;
+    if (c < 0 || c > 11171) return ch;
+    return RR_L[Math.floor(c / 588)] + RR_V[Math.floor((c % 588) / 28)] + RR_T[c % 28];
+  }).join("");
+// How common surnames are actually spelled in passports and email signatures.
+const SURNAMES: Record<string, string[]> = {
+  김: ["kim", "gim"], 이: ["lee", "yi", "rhee", "li", "i"], 박: ["park", "pak", "bak"], 최: ["choi", "choe"],
+  정: ["jung", "jeong", "chung"], 강: ["kang", "gang"], 조: ["cho", "jo"], 윤: ["yoon", "yun"], 장: ["jang", "chang"],
+  임: ["lim", "im", "yim"], 한: ["han"], 오: ["oh", "o"], 서: ["seo", "suh"], 신: ["shin", "sin"], 권: ["kwon", "gwon"],
+  황: ["hwang"], 안: ["ahn", "an"], 송: ["song"], 류: ["ryu", "yoo", "yu", "rhew"], 유: ["yoo", "yu"], 전: ["jeon", "chun", "jun"],
+  홍: ["hong"], 고: ["ko", "go"], 문: ["moon", "mun"], 양: ["yang"], 손: ["son", "sohn"], 배: ["bae", "pae"], 백: ["baek", "paik", "baik"],
+  허: ["heo", "huh", "hur"], 남: ["nam"], 노: ["noh", "roh", "no"], 하: ["ha"], 곽: ["kwak", "gwak"], 성: ["sung", "seong"],
+  차: ["cha"], 주: ["joo", "ju", "chu"], 우: ["woo", "u"], 구: ["koo", "ku", "gu"], 민: ["min"], 진: ["jin", "chin"], 나: ["na", "ra"],
+  지: ["ji", "chi"], 엄: ["um", "eom"], 원: ["won"], 천: ["chun", "cheon"], 방: ["bang"], 공: ["kong", "gong"], 현: ["hyun", "hyeon"],
+  함: ["ham"], 변: ["byun", "byeon"], 염: ["yeom", "yum"], 여: ["yeo", "yuh"], 추: ["choo", "chu"], 도: ["do", "doh"], 석: ["seok", "suk"],
+  선: ["sun", "seon"], 설: ["seol", "sul"], 마: ["ma"], 길: ["gil", "kil"], 연: ["yeon", "yun"], 표: ["pyo"], 명: ["myung"], 기: ["ki", "gi"],
+  왕: ["wang"], 금: ["keum", "geum"], 인: ["in"], 제: ["je"], 탁: ["tak"], 국: ["kook", "guk"], 은: ["eun"], 용: ["yong"], 육: ["yuk"],
+};
+const HANGUL = /[가-힣]/;
+
+// One person per row: does this query point at them?
+function nameMatches(q: string, fullName: string, organisation: string): { hit: boolean; front: boolean } {
+  const name = foldName(`${fullName} ${romanise(fullName)}`);
+  const hay = `${name} ${foldName(organisation)}`;
+  const flat = hay.replace(/ /g, "");
+  const words = hay.split(" ");
+  const qWords = foldName(q).split(" ").filter(Boolean);
+  if (!qWords.length) return { hit: false, front: false };
+  const plain = qWords.every((w) => hay.includes(w)) || flat.includes(qWords.join(""));
+  if (plain || !HANGUL.test(q)) return { hit: plain, front: name.startsWith(qWords[0]) };
+  // Korean query against a romanised name: try "whole thing is the given
+  // name" and "first syllable is the surname".
+  const ko = q.replace(/[^가-힣]/g, "");
+  const given = (s: string) => !s || flat.includes(foldName(romanise(s)));
+  if (given(ko)) return { hit: true, front: false };
+  const sur = SURNAMES[ko[0]];
+  if (sur) {
+    const surHit = sur.map(foldName).some((v) => words.includes(v) || flat.startsWith(v) || name.replace(/ /g, "").endsWith(v));
+    if (surHit && given(ko.slice(1))) return { hit: true, front: true };
+  }
+  return { hit: false, front: false };
+}
 const maskEmail = (e: string) => {
   const [u = "", d = ""] = e.split("@");
   return `${u.slice(0, 2)}${"•".repeat(Math.max(2, Math.min(u.length - 2, 5)))}@${d}`;
@@ -725,7 +787,7 @@ export interface CheckInMatch {
 export const findRsvpForCheckIn = createServerFn({ method: "POST" })
   .validator((data: { key: string; q: string }) => data)
   .handler(async ({ data }): Promise<{ ok: true; matches: CheckInMatch[] } | { ok: false }> => {
-    if (!loungeKeyOk(data.key)) return { ok: false };
+    if (!(await loungeKeyOk(data.key))) return { ok: false };
     const words = foldName(data.q ?? "").split(" ").filter(Boolean);
     if (words.join("").length < 2) return { ok: true, matches: [] };
     const { data: rows, error } = await supabaseAdmin
@@ -737,10 +799,8 @@ export const findRsvpForCheckIn = createServerFn({ method: "POST" })
     }
     const scored = (rows ?? [])
       .map((r) => {
-        const name = foldName(String(r.full_name));
-        const hay = `${name} ${foldName(String(r.organisation))}`;
-        const hit = words.every((w) => hay.includes(w)) || hay.replace(/ /g, "").includes(words.join(""));
-        return { r, hit, score: name.startsWith(words[0]) ? 0 : name.includes(words[0]) ? 1 : 2 };
+        const m = nameMatches(data.q, String(r.full_name), String(r.organisation ?? ""));
+        return { r, hit: m.hit, score: m.front ? 0 : 1 };
       })
       .filter((x) => x.hit)
       .sort((a, b) => a.score - b.score || String(a.r.full_name).localeCompare(String(b.r.full_name)));
@@ -758,7 +818,7 @@ export const findRsvpForCheckIn = createServerFn({ method: "POST" })
 export const checkInById = createServerFn({ method: "POST" })
   .validator((data: { key: string; rsvpId: string }) => data)
   .handler(async ({ data }): Promise<{ ok: boolean; recorded?: boolean }> => {
-    if (!loungeKeyOk(data.key) || !data.rsvpId) return { ok: false };
+    if (!(await loungeKeyOk(data.key)) || !data.rsvpId) return { ok: false };
     if (!checkInLive()) return { ok: true, recorded: false };
     const { error } = await supabaseAdmin
       .from("rsvps")
@@ -779,7 +839,7 @@ export const walkInRsvp = createServerFn({ method: "POST" })
     (data: { key: string; fullName: string; organisation: string; jobTitle: string; email: string; primaryInterest?: string }) => data,
   )
   .handler(async ({ data }): Promise<{ ok: boolean; message?: string }> => {
-    if (!loungeKeyOk(data.key)) return { ok: false, message: "Scan the QR code at the entrance to register." };
+    if (!(await loungeKeyOk(data.key))) return { ok: false, message: "Scan the QR code at the entrance to register." };
     const email = data.email?.toLowerCase().trim();
     const fullName = data.fullName?.trim();
     const organisation = data.organisation?.trim();

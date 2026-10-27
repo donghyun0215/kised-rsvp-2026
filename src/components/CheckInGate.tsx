@@ -78,11 +78,16 @@ function Steps({
   const [err, setErr] = useState("");
   const [w, setW] = useState({ fullName: "", organisation: "", jobTitle: "", email: "", primaryInterest: "" });
   const seq = useRef(0);
+  const [walkOpen, setWalkOpen] = useState(false);
+  const walkRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (walkOpen) walkRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+  }, [walkOpen]);
 
   useEffect(() => {
     if (step !== "search") return;
     const term = q.trim();
-    if (term.replace(/\s/g, "").length < 2) {
+    if (term.replace(/\s/g, "").length < (/[\uac00-\ud7a3]/.test(term) ? 1 : 2)) {
       setMatches(null);
       return;
     }
@@ -167,11 +172,12 @@ function Steps({
     );
   }
 
-  if (step === "walkin") {
-    const ready = w.fullName.trim() && w.organisation.trim() && w.jobTitle.trim() && /^\S+@\S+\.\S+$/.test(w.email.trim());
-    const set = (k: keyof typeof w) => (e: { target: { value: string } }) => setW((v) => ({ ...v, [k]: e.target.value }));
-    return (
+  const ready = w.fullName.trim() && w.organisation.trim() && w.jobTitle.trim() && /^\S+@\S+\.\S+$/.test(w.email.trim());
+  const set = (k: keyof typeof w) => (e: { target: { value: string } }) => setW((v) => ({ ...v, [k]: e.target.value }));
+  const walkinForm = (
       <form
+        ref={walkRef}
+        className="mt-8 scroll-mt-24 border-t border-white/12 pt-6"
         onSubmit={(e) => {
           e.preventDefault();
           if (ready) void register();
@@ -204,14 +210,13 @@ function Steps({
           <button type="submit" disabled={busy || !ready} className={T.primary}>
             <BusyLabel busy={busy} text="Registering…">Register and check in</BusyLabel>
           </button>
-          <button type="button" onClick={() => setStep("search")} className={T.ghost}>
-            Back to search
+          <button type="button" onClick={() => setWalkOpen(false)} className={T.ghost}>
+            Cancel
           </button>
         </div>
         {err && <p role="alert" className={`${T.error} mt-4`}>{err}</p>}
       </form>
-    );
-  }
+  );
 
   return (
     <div>
@@ -256,16 +261,26 @@ function Steps({
           </ul>
         )}
         {matches && matches.length === 0 && !searching && <p className={`${T.meta} mt-3`}>No one by that name yet.</p>}
-        {err && <p role="alert" className={`${T.error} mt-3`}>{err}</p>}
+        {err && !walkOpen && <p role="alert" className={`${T.error} mt-3`}>{err}</p>}
       </div>
       <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
-        <button type="button" onClick={() => setStep("walkin")} className={T.secondary}>
-          I'm not on the list
+        <button
+          type="button"
+          aria-expanded={walkOpen}
+          onClick={() => {
+            if (!walkOpen && !w.fullName && q.trim() && !/[\uac00-\ud7a3]/.test(q)) setW((v) => ({ ...v, fullName: q.trim() }));
+            setWalkOpen((o) => !o);
+            setErr("");
+          }}
+          className={T.secondary}
+        >
+          I'm not on the list (walk-in)
         </button>
         <button type="button" onClick={onUseEmail} className={T.ghost}>
           Use my email instead
         </button>
       </div>
+      {walkOpen && walkinForm}
     </div>
   );
 }
