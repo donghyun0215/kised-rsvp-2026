@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { checkInById, findRsvpForCheckIn, walkInRsvp, type CheckInMatch } from "@/lib/booking.server";
+import { checkInById, findRsvpForCheckIn, listCheckInRoster, walkInRsvp, type CheckInMatch } from "@/lib/booking.server";
+import { nameMatches } from "@/lib/namematch";
 import { BusyLabel } from "@/components/Spinner";
 
 // Entrance QR flow: find your name → confirm → checked in (show the desk for
@@ -84,10 +85,42 @@ function Steps({
     if (walkOpen) walkRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
   }, [walkOpen]);
 
+  // Guest list loaded once (and refreshed every 2 min for late RSVPs), then
+  // filtered in the browser so suggestions follow every keystroke. Until it
+  // arrives, or if it fails, the server search is the fallback.
+  const [roster, setRoster] = useState<CheckInMatch[] | null>(null);
   useEffect(() => {
-    if (step !== "search") return;
-    const term = q.trim();
-    if (term.replace(/\s/g, "").length < (/[\uac00-\ud7a3]/.test(term) ? 1 : 2)) {
+    let alive = true;
+    const load = () =>
+      listCheckInRoster({ data: { key: loungeKey } })
+        .then((r) => {
+          if (!alive) return;
+          if (r.ok) setRoster(r.people);
+          else setErr("This QR code isn't valid any more. Please ask the desk.");
+        })
+        .catch(() => {});
+    void load();
+    const t = setInterval(load, 120_000);
+    return () => {
+      alive = false;
+      clearInterval(t);
+    };
+  }, [loungeKey]);
+
+  const term = q.trim();
+  const tooShort = term.replace(/\s/g, "").length < (/[\uac00-\ud7a3]/.test(term) ? 1 : 2);
+  const local = roster && !tooShort
+    ? roster
+        .map((r) => ({ r, m: nameMatches(term, r.full_name, r.organisation) }))
+        .filter((x) => x.m.hit)
+        .sort((a, b) => Number(b.m.front) - Number(a.m.front) || a.r.full_name.localeCompare(b.r.full_name))
+        .slice(0, 6)
+        .map((x) => x.r)
+    : null;
+
+  useEffect(() => {
+    if (step !== "search" || roster) return;
+    if (tooShort) {
       setMatches(null);
       return;
     }
@@ -99,9 +132,10 @@ function Steps({
       setSearching(false);
       if (res.ok) setMatches(res.matches);
       else setErr("This QR code isn't valid any more. Please ask the desk.");
-    }, 220);
+    }, 150);
     return () => clearTimeout(t);
-  }, [q, step, loungeKey]);
+  }, [term, tooShort, step, loungeKey, roster]);
+  const shown = roster ? local : matches;
 
   const finish = (who: CheckedInAs, recorded: boolean) => {
     setMe(who);
@@ -117,6 +151,7 @@ function Steps({
     const res = await checkInById({ data: { key: loungeKey, rsvpId: pick.id } });
     setBusy(false);
     if (!res.ok) return setErr("Couldn't check you in. Please try again or ask the desk.");
+    if (res.recorded !== false) setRoster((r) => r && r.map((x) => (x.id === pick.id ? { ...x, checked_in: true } : x)));
     finish({ id: pick.id, name: pick.full_name }, res.recorded !== false);
   };
 
@@ -237,9 +272,9 @@ function Steps({
         className={`${T.field} mt-2`}
       />
       <div className="min-h-[3rem]" aria-live="polite">
-        {matches && matches.length > 0 && (
+        {shown && shown.length > 0 && (
           <ul className="mt-1">
-            {matches.map((m) => (
+            {shown.map((m) => (
               <li key={m.id}>
                 <button
                   type="button"
@@ -260,7 +295,7 @@ function Steps({
             ))}
           </ul>
         )}
-        {matches && matches.length === 0 && !searching && <p className={`${T.meta} mt-3`}>No one by that name yet.</p>}
+        {shown && shown.length === 0 && (roster || !searching) && <p className={`${T.meta} mt-3`}>No one by that name yet.</p>}
         {err && !walkOpen && <p role="alert" className={`${T.error} mt-3`}>{err}</p>}
       </div>
       <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
