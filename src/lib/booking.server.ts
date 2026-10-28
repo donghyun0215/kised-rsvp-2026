@@ -801,7 +801,7 @@ export const walkInRsvp = createServerFn({ method: "POST" })
   .validator(
     (data: { key: string; fullName: string; organisation: string; jobTitle: string; email: string; primaryInterest?: string }) => data,
   )
-  .handler(async ({ data }): Promise<{ ok: boolean; message?: string }> => {
+  .handler(async ({ data }): Promise<{ ok: boolean; message?: string; existing?: boolean }> => {
     if (!(await loungeKeyOk(data.key))) return { ok: false, message: "Scan the QR code at the entrance to register." };
     const email = data.email?.toLowerCase().trim();
     const fullName = data.fullName?.trim();
@@ -821,7 +821,8 @@ export const walkInRsvp = createServerFn({ method: "POST" })
           .eq("id", existing.id)
           .is("checked_in_at", null);
       }
-      return { ok: true };
+      // Already on the list: no second RSVP, just checked in.
+      return { ok: true, existing: true };
     }
     const { error } = await supabaseAdmin.from("rsvps").insert({
       full_name: fullName,

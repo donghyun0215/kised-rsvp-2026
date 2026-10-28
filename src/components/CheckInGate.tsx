@@ -80,6 +80,7 @@ function Steps({
   const [w, setW] = useState({ fullName: "", organisation: "", jobTitle: "", email: "", primaryInterest: "" });
   const seq = useRef(0);
   const [walkOpen, setWalkOpen] = useState(false);
+  const [already, setAlready] = useState(false);
   const walkRef = useRef<HTMLFormElement>(null);
   useEffect(() => {
     if (walkOpen) walkRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
@@ -162,6 +163,7 @@ function Steps({
     const res = await walkInRsvp({ data: { key: loungeKey, ...w } });
     setBusy(false);
     if (!res.ok) return setErr(res.message ?? "Something went wrong.");
+    setAlready(Boolean(res.existing));
     finish({ id: null, name: w.fullName.trim(), email: w.email.trim().toLowerCase() }, true);
   };
 
@@ -178,6 +180,7 @@ function Steps({
           {me.name}
           {counted && <span className={T.faint}>, {at}</span>}
         </p>
+        {already && <p className={`${T.note} mt-4`}>This email was already registered, so we checked you in on your existing RSVP.</p>}
         {counted && <p className={`${T.note} mt-4`}>Show this screen at the desk to collect your name badge.</p>}
         <button type="button" onClick={() => onEnter(me)} className={`${T.donePrimary} mt-6 w-full sm:w-auto`}>
           Enter the lounge
