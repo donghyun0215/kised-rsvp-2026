@@ -90,12 +90,19 @@ function AdminPage() {
       })
       .subscribe();
 
-    // Fallback poll every 20s in case realtime isn't enabled on the table
-    const poll = setInterval(() => load(pwRef.current), 20000);
+    // Realtime can't see rsvps (RLS), so check-ins arrive by polling: every
+    // 5s while this tab is open, paused in the background, and at once when
+    // you come back to it.
+    const tick = () => {
+      if (document.visibilityState === "visible") load(pwRef.current);
+    };
+    const poll = setInterval(tick, 5000);
+    document.addEventListener("visibilitychange", tick);
 
     return () => {
       supabase.removeChannel(channel);
       clearInterval(poll);
+      document.removeEventListener("visibilitychange", tick);
     };
   }, [authed, load]);
 
