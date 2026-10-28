@@ -680,7 +680,7 @@ export const markLoungeCheckIn = createServerFn({ method: "POST" })
     // attendance. ponytail: hardcoded window; make it an admin setting next event.
     const keyValid = await keyOk(data.key);
     const now = Date.now();
-    const eventLive = now >= Date.parse("2026-10-28T12:00:00+08:00") && now <= Date.parse("2026-10-28T22:00:00+08:00");
+    const eventLive = now >= Date.parse("2026-10-28T08:00:00+08:00") && now <= Date.parse("2026-10-28T22:00:00+08:00");
     if (!keyValid && !eventLive) return { ok: false };
     const email = data.email?.toLowerCase().trim();
     if (!email) return { ok: false };
@@ -703,7 +703,7 @@ export const markLoungeCheckIn = createServerFn({ method: "POST" })
 // wall; My Contacts still asks for the RSVP email. Outside the event window
 // the QR still opens the lounge, it just doesn't count anyone.
 // ponytail: hardcoded window, same as markLoungeCheckIn.
-const CHECKIN_FROM = Date.parse("2026-10-28T12:00:00+08:00");
+const CHECKIN_FROM = Date.parse("2026-10-28T08:00:00+08:00");
 const CHECKIN_TO = Date.parse("2026-10-28T22:00:00+08:00");
 const loungeKeyOk = (k?: string) => keyOk(k);
 const checkInLive = () => Date.now() >= CHECKIN_FROM && Date.now() <= CHECKIN_TO;
