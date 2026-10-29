@@ -374,7 +374,16 @@ function AdminPage() {
         )}
 
         {/* GRID VIEW */}
-        <h2 className="mt-10 text-lg font-bold text-navy">1:1 Business Meetups — Rounds ({MEETUP_DAY_SHORT})</h2>
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-bold text-navy">1:1 Business Meetups — Rounds ({MEETUP_DAY_SHORT})</h2>
+          <button
+            onClick={() => downloadMeetupsCsv(bookings, rsvps)}
+            className="rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-navy hover:bg-muted"
+            title="Every 1:1 booking, one row per meeting, sorted by startup and round"
+          >
+            Export 1:1 CSV
+          </button>
+        </div>
         <p className="text-sm text-muted-foreground">Click a filled slot to cancel it and reopen it for others.</p>
         <div className="mt-4 overflow-x-auto rounded-2xl border border-border shadow-sm">
           <table className="w-full min-w-[560px] border-collapse text-sm">
@@ -707,6 +716,36 @@ function downloadOutreachCsv(rsvps: AdminRsvp[]) {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `cmk-outreach-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// 1:1 meeting list for the startups / interns: one row per booking,
+// grouped by startup then round. "Checked in" comes from the RSVP with the
+// same email (blank if they never RSVP'd separately).
+function downloadMeetupsCsv(bookings: AdminBooking[], rsvps: AdminRsvp[]) {
+  const esc = (v: string | null | undefined) => {
+    const s = v ?? "";
+    return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const checked = new Map(rsvps.map((r) => [r.email.toLowerCase(), r.checked_in_at ? "yes" : "no"]));
+  const order = new Map(TIMESLOTS.map((t, i) => [t.id, i]));
+  const nameOf = (slug: string) => companies.find((c) => c.slug === slug)?.name ?? slug;
+  const rows = bookings
+    .filter((b) => order.has(b.timeslot_id))
+    .sort((a, b) => nameOf(a.company_id).localeCompare(nameOf(b.company_id)) || (order.get(a.timeslot_id) ?? 0) - (order.get(b.timeslot_id) ?? 0));
+  const header = "Startup,Day,Round,Time,Guest,Organisation,Job title,Email,Phone,Interest,Checked in,Booked at (SGT)";
+  const lines = rows.map((b) => {
+    const slot = getSlotInfo(b.timeslot_id);
+    const booked = new Date(b.created_at).toLocaleString("en-SG", { timeZone: "Asia/Singapore", dateStyle: "medium", timeStyle: "short" });
+    return [nameOf(b.company_id), slot.context, slot.label, slot.time, b.full_name, b.organisation, b.job_title, b.email, b.phone, b.primary_interest, checked.get(b.email.toLowerCase()) ?? "", booked]
+      .map(esc)
+      .join(",");
+  });
+  const blob = new Blob(["\ufeff" + header + "\r\n" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `kised-1on1-meetings-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
   URL.revokeObjectURL(a.href);
 }
